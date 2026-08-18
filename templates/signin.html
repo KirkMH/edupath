@@ -1,0 +1,66 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPath - Smart Assessment. Confident Career Choices.</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-logo.png' %}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts - Inter for clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+    <div class="page-container">
+        <!-- Left Column (Hero Info) -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo">
+            </div>
+            <p class="description">
+                Welcome to EduPath. Your future, clearly defined. We provide smart, personalized assessments and career pathing tools to help you navigate your academic journey with confidence.
+            </p>
+        </div>
+
+        <!-- Right Column (Form) -->
+        <div class="right-column">
+            <div class="form-card">
+                <h2>Sign In</h2>
+                <p class="sub-header">or <a href="{% url 'index' %}">Sign Up</a></p>
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
+                        <div class="password-row">
+                            <label style="display: flex; align-items: center; font-size: 0.8rem; color: #6b7280; font-weight: 400; margin-bottom: 0; cursor: pointer;">
+                                <input type="checkbox" id="rememberMe" name="rememberMe" style="margin-right: 0.5rem; width: auto; cursor: pointer;"> Remember me
+                            </label>
+                            <a href="#" class="forgot-password">Forgot Password?</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+
+                <p class="footer-link">Don't have an account? <a href="{% url 'index' %}">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

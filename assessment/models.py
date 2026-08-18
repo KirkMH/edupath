@@ -14,6 +14,7 @@ class StudentProfile(models.Model):
         related_name='student_profile'
     )
     student_id = models.CharField(max_length=64, blank=True, null=True, unique=True)
+    full_name = models.CharField(max_length=128, blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     sex = models.CharField(max_length=20, blank=True, null=True)
     last_date_taken = models.DateTimeField(blank=True, null=True)
