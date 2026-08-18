@@ -40,6 +40,9 @@ class AptitudeQuestion(models.Model):
     def __str__(self):
         return f"Q{self.question_id} ({self.dimension}): {self.question_text[:50]}..."
 
+    class Meta:
+        verbose_name_plural = "Aptitude Questions"
+
 
 class InterestQuestion(models.Model):
     """
@@ -64,6 +67,9 @@ class InterestQuestion(models.Model):
     def __str__(self):
         return f"Item {self.item_number} ({self.riasec_area}): {self.question_text[:50]}..."
 
+    class Meta:
+        verbose_name_plural = "Interest Questions"
+
 
 class ProgramCriteria(models.Model):
     """
@@ -81,6 +87,9 @@ class ProgramCriteria(models.Model):
 
     def __str__(self):
         return f"{self.program.abbreviation} Criteria - {self.dimension_name} (weight={self.weight})"
+
+    class Meta:
+        verbose_name_plural = "Program Criteria"
 
 
 class Rule(models.Model):
@@ -115,3 +124,6 @@ class ScoreInterpretation(models.Model):
 
     def __str__(self):
         return f"{self.label} ({self.min_score} - {self.max_score})"
+
+    class Meta:
+        verbose_name_plural = "Score Interpretations"

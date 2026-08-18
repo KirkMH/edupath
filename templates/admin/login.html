@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduPath - Administrator's Login</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-logo.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-icon.png' %}">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts - Inter for clean typography -->
@@ -17,19 +17,19 @@
 <body>
     <div class="page-container">
         <!-- Left Column (Hero Info) -->
-        <div class="left-column">
+        <div class="left-column" style="background-color: #d95d39;">
             <div class="logo-container">
                 <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo" style="height: 250px;">
             </div>
-            <p class="description" style="color: rgba(30, 41, 59, 1); font-weight: 500;">
-                EduPath Administrator Portal. Secure access for EduPath administrative, monitoring, and assessment management operations.
-            </p>
+            <h2 style="color: rgba(30, 41, 59, 1);">
+                EduPath Administrator Portal
+            </h2>
         </div>
 
         <!-- Right Column (Form) -->
         <div class="right-column">
             <div class="form-card">
-                <h2 style="margin-bottom: 1.5rem;">Administrator's Login</h2>
+                <h2 style="margin-bottom: 1.5rem; text-align: center;">Administrator's Login</h2>
                 
                 <form action="{{ app_path }}" method="post">
                     {% csrf_token %}

@@ -22,6 +22,9 @@ class StudentProfile(models.Model):
     def __str__(self):
         return f"Profile: {self.user.username} (ID: {self.student_id or 'None'})"
 
+    class Meta:
+        verbose_name_plural = "Student Profiles"
+
 
 class StudentAptitudeResponse(models.Model):
     """
@@ -50,6 +53,9 @@ class StudentAptitudeResponse(models.Model):
     def __str__(self):
         return f"{self.student.user.username} - Aptitude Q{self.question_id} ({'Correct' if self.is_correct else 'Incorrect'})"
 
+    class Meta:
+        verbose_name_plural = "Student Aptitude Responses"
+
 
 class StudentInterestResponse(models.Model):
     """
@@ -73,6 +79,9 @@ class StudentInterestResponse(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} - Interest Q{self.question_id} (Rating: {self.rating})"
+
+    class Meta:
+        verbose_name_plural = "Student Interest Responses"
 
 
 class AssessmentResult(models.Model):
@@ -119,3 +128,6 @@ class AssessmentResult(models.Model):
 
     def __str__(self):
         return f"Result: {self.student.user.username} (RIASEC: {self.riasec_code})"
+
+    class Meta:
+        verbose_name_plural = "Assessment Results"
