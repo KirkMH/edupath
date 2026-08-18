@@ -9,4 +9,6 @@ def signin(request):
     return render(request, 'signin.html')
 
 
-
+def dashboard(request):
+    return render(request, 'assessment/dashboard.html')
+    
