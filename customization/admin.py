@@ -23,8 +23,8 @@ class ProgramAdmin(admin.ModelAdmin):
 
 @admin.register(AptitudeQuestion)
 class AptitudeQuestionAdmin(admin.ModelAdmin):
-    list_display = ('question_id', 'dimension', 'question_text_short', 'correct_answer', 'status')
-    list_filter = ('dimension', 'status')
+    list_display = ('question_id', 'dimension', 'question_text_short', 'correct_answer', 'status', 'for_validation')
+    list_filter = ('dimension', 'status', 'for_validation')
     search_fields = ('question_text', 'dimension')
 
     def question_text_short(self, obj):
