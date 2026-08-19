@@ -162,3 +162,45 @@ class SignUpAndLoginTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Administrator's Login")
 
+    def test_aptitude_assessment_flow(self):
+        from customization.models import AptitudeQuestion
+        from assessment.models import StudentAptitudeResponse
+
+        q1 = AptitudeQuestion.objects.create(
+            dimension='Numerical Reasoning',
+            question_text='What is 2 + 2?',
+            option_a='3', option_b='4', option_c='5', option_d='6',
+            correct_answer='B',
+            status=True,
+            for_validation=True
+        )
+        q2 = AptitudeQuestion.objects.create(
+            dimension='Deductive Reasoning',
+            question_text='Inactive question?',
+            option_a='A', option_b='B', option_c='C', option_d='D',
+            correct_answer='A',
+            status=False,
+            for_validation=False
+        )
+
+        self.client.force_login(self.existing_user)
+
+        # GET request test
+        response = self.client.get(reverse('assess_aptitude'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<b>FOR VALIDATION.</b> What is 2 + 2?")
+        self.assertNotContains(response, "Inactive question?")
+
+        # POST submission test
+        post_data = {
+            f'question_{q1.question_id}': 'B'
+        }
+        submit_response = self.client.post(reverse('assess_aptitude'), post_data)
+        self.assertRedirects(submit_response, reverse('preference_ready'))
+
+        # Verify StudentAptitudeResponse record created
+        resp_obj = StudentAptitudeResponse.objects.get(student=self.existing_profile, question=q1)
+        self.assertEqual(resp_obj.selected_answer, 'B')
+        self.assertTrue(resp_obj.is_correct)
+
+

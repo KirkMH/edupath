@@ -3,7 +3,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from .models import StudentProfile
+from django.utils import timezone
+from customization.models import AptitudeQuestion
+from .models import StudentProfile, StudentAptitudeResponse
 
 
 def index(request):
@@ -181,7 +183,33 @@ def aptitude_ready(request):
 
 @login_required(login_url='signin')
 def assess_aptitude(request):
-    return render(request, 'assessment/aptitude-assess.html')
+    student_profile = request.user.student_profile
+    questions = AptitudeQuestion.objects.filter(status=True).order_by('question_id')
+
+    if request.method == 'POST':
+        for question in questions:
+            selected_choice = request.POST.get(f'question_{question.question_id}')
+            if selected_choice:
+                is_correct = (selected_choice == question.correct_answer)
+                StudentAptitudeResponse.objects.update_or_create(
+                    student=student_profile,
+                    question=question,
+                    defaults={
+                        'selected_answer': selected_choice,
+                        'is_correct': is_correct
+                    }
+                )
+        student_profile.last_date_taken = timezone.now()
+        student_profile.save()
+        return redirect('preference_ready')
+
+    existing_responses = StudentAptitudeResponse.objects.filter(student=student_profile)
+    user_answers = {resp.question_id: resp.selected_answer for resp in existing_responses}
+
+    return render(request, 'assessment/aptitude-assess.html', {
+        'questions': questions,
+        'user_answers': user_answers,
+    })
 
 
 @login_required(login_url='signin')

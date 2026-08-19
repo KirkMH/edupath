@@ -46,8 +46,8 @@ class AptitudeQuestion(models.Model):
     option_c = models.CharField(max_length=255, verbose_name="Option C")
     option_d = models.CharField(max_length=255, verbose_name="Option D")
     correct_answer = models.CharField(max_length=1, choices=ANSWER_CHOICES, verbose_name="Correct Answer")
-    status = models.BooleanField(default=True, verbose_name="Status")
-    for_validation = models.BooleanField(default=True, verbose_name="For Validation")
+    status = models.BooleanField(default=True, verbose_name="Active?")
+    for_validation = models.BooleanField(default=True, verbose_name="For Validation?")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
 
     def __str__(self):
