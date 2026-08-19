@@ -1,0 +1,351 @@
+{% extends 'assessment/base.html' %}
+{% load static %}
+
+{% block title %}EduPath | Aptitude Assessment{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/aptitude-assess.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="back-nav">
+      <a href="{% url 'dashboard' %}" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+
+    <!-- Hero Assessment Header -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="badge">APTITUDE ASSESSMENT</div>
+        <h1 class="hero-title">Cognitive Ability Test</h1>
+        <p class="hero-desc">
+          Evaluate your problem-solving, numerical, and analytical reasoning skills.<br>
+          Select the option (A, B, C, or D) that best answers each question.
+        </p>
+      </div>
+      <div class="hero-illustration">
+        <!-- SVG Graphic for Cognitive Ability Test -->
+        <svg width="180" height="150" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="130" cy="90" r="60" fill="#e8f3fe" />
+          <path d="M40 130 C40 100, 70 80, 85 100 C100 120, 80 140, 40 130 Z" fill="#b9dcfe" opacity="0.6"/>
+          <path d="M15 110 C15 80, 45 60, 60 80 C75 100, 55 120, 15 110 Z" fill="#75b5fe" opacity="0.6"/>
+          <rect x="90" y="20" width="95" height="125" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="4" />
+          <rect x="115" y="12" width="45" height="16" rx="6" fill="#0284c7" />
+          <circle cx="137.5" cy="18" r="3" fill="#ffffff" />
+          <!-- A, B, C Choice Badges in Graphic -->
+          <rect x="108" y="44" width="16" height="16" rx="4" fill="#0ea5e9" />
+          <text x="112" y="56" fill="#ffffff" font-weight="bold" font-size="11">A</text>
+          <line x1="132" y1="52" x2="168" y2="52" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" />
+
+          <rect x="108" y="70" width="16" height="16" rx="4" fill="#0ea5e9" />
+          <text x="112" y="82" fill="#ffffff" font-weight="bold" font-size="11">B</text>
+          <line x1="132" y1="78" x2="168" y2="78" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" />
+
+          <rect x="108" y="96" width="16" height="16" rx="4" fill="#0ea5e9" />
+          <text x="112" y="108" fill="#ffffff" font-weight="bold" font-size="11">C</text>
+          <line x1="132" y1="104" x2="168" y2="104" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" />
+
+          <circle cx="170" cy="130" r="18" fill="#0284c7" />
+          <path d="M163 130 L168 135 L178 124" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Overall Progress Card -->
+    <div class="progress-card">
+      <div class="progress-left">
+        <h4>Overall Progress</h4>
+        <p>Page <span class="current">3</span> of <span class="total">8</span></p>
+      </div>
+      <div class="progress-right">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-percentage">37.5%</div>
+      </div>
+    </div>
+
+    <!-- Main MCQ Questionnaire Form -->
+    <form id="aptitude-assessment-form">
+      <div class="mcq-container">
+
+        <!-- Question Item 1 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">13</div>
+              <span class="category-tag">Numerical Reasoning</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            If a company's quarterly revenue increased from ₱120,000 to ₱150,000, what was the percentage increase?
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q13" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">20%</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q13" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">25%</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q13" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">30%</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q13" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">35%</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question Item 2 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">14</div>
+              <span class="category-tag">Deductive Reasoning</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            All project managers use scheduling software. Sarah is a project manager. Which statement MUST be true?
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q14" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">Sarah created the scheduling software.</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q14" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">Sarah uses scheduling software.</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q14" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">Everyone who uses scheduling software is a project manager.</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q14" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">Sarah only manages software engineering teams.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question Item 3 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">15</div>
+              <span class="category-tag">Inductive Reasoning</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            Select the number that logically completes the sequence: 4, 9, 19, 39, 79, [ ? ]
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q15" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">119</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q15" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">139</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q15" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">159</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q15" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">179</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question Item 4 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">16</div>
+              <span class="category-tag">Information Ordering</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            Which sequence correctly places the data workflow steps in logical chronological order?
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q16" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">Data Collection → Validation → Analysis → Reporting</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q16" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">Validation → Data Collection → Reporting → Analysis</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q16" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">Analysis → Validation → Data Collection → Reporting</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q16" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">Reporting → Analysis → Validation → Data Collection</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question Item 5 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">17</div>
+              <span class="category-tag">Problem Sensitivity</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            An automated monitoring dashboard shows a sudden 40% drop in website checkout completions. Which area requires immediate diagnostic investigation?
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q17" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">Font style of the homepage footer</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q17" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">Payment gateway authentication & API endpoints</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q17" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">Team biography images on the About Us page</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q17" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">Social media marketing post schedule for next week</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question Item 6 -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">18</div>
+              <span class="category-tag">Visualization</span>
+            </div>
+          </div>
+          <div class="question-stem">
+            A solid 3D cube is unfolded flat into a 2D cross pattern. How many total square faces will the unfolded pattern contain?
+          </div>
+          <div class="choices-grid">
+            <label class="choice-card">
+              <input type="radio" name="q18" value="A">
+              <span class="choice-letter">A</span>
+              <span class="choice-text">4 squares</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q18" value="B">
+              <span class="choice-letter">B</span>
+              <span class="choice-text">5 squares</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q18" value="C">
+              <span class="choice-letter">C</span>
+              <span class="choice-text">6 squares</span>
+            </label>
+
+            <label class="choice-card">
+              <input type="radio" name="q18" value="D">
+              <span class="choice-letter">D</span>
+              <span class="choice-text">8 squares</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 8-Page Navigation Bar -->
+      <div class="pagination-bar">
+        <button type="button" class="btn-nav-prev" onclick="window.location.href='{% url 'aptitude_ready' %}'">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Previous</span>
+        </button>
+
+        <div class="page-numbers">
+          <span class="page-link">1</span>
+          <span class="page-link">2</span>
+          <span class="page-link active">3</span>
+          <span class="page-link">4</span>
+          <span class="page-link">5</span>
+          <span class="page-link">6</span>
+          <span class="page-link">7</span>
+          <span class="page-link">8</span>
+        </div>
+
+        <button type="submit" class="btn-nav-next">
+          <span>Next</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </form>
+
+    <!-- Bottom Important Info Banner -->
+    <section class="info-banner">
+      <div class="info-banner-left">
+        <div class="info-icon-wrapper">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div class="info-text">
+          <h4>Aptitude Evaluation Standard</h4>
+          <p>Please read each question carefully before selecting your answer.<br>Your choices evaluate your cognitive strengths across 6 key domains.</p>
+        </div>
+      </div>
+      <div class="info-graphic">
+        <svg width="110" height="70" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="60" cy="65" rx="50" ry="15" fill="#d0e5fd" opacity="0.6"/>
+          <path d="M20 20 L22 26 L28 28 L22 30 L20 36 L18 30 L12 28 L18 26 Z" fill="#93c5fd" opacity="0.8"/>
+          <path d="M100 24 L101.5 28 L106 29.5 L101.5 31 L100 35 L98.5 31 L94 29.5 L98.5 28 Z" fill="#93c5fd" opacity="0.8"/>
+          <rect x="52" y="32" width="36" height="30" rx="6" fill="#38bdf8" />
+          <path d="M58 32 V24 C58 17.5 63 12 70 12 C77 12 82 17.5 82 24 V32" stroke="#0284c7" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <circle cx="70" cy="44" r="3" fill="#0369a1" />
+          <path d="M68.5 45 L71.5 45 L72 53 L68 53 Z" fill="#0369a1" />
+        </svg>
+      </div>
+    </section>
+{% endblock %}

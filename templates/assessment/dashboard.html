@@ -1,37 +1,9 @@
+{% extends 'assessment/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPath | Student Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-</head>
 
-<body>
+{% block title %}EduPath | Student Dashboard{% endblock %}
 
-    <header class="header">
-        <div class="brand">
-            <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo">
-            <span class="brand-name">Edu<span class="text-bold">Path</span></span>
-        </div>
-
-        <div class="header-actions">
-            <div class="student-profile">
-                <div class="avatar"><i class="fa-solid fa-circle-user"></i></div>
-                <span>Hi, Student!</span>
-            </div>
-
-            <button class="sign-out">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Sign Out</span>
-            </button>
-        </div>
-    </header>
-
-    <main class="container">
-
+{% block content %}
         <section class="hero">
             <div class="hero-content">
                 <h1 class="hero-title">
@@ -171,23 +143,9 @@
                 </p>
             </div>
 
-            <button class="start-button" onclick="startAssessment()">
+            <button class="start-button" onclick="window.location.href='{% url 'aptitude_ready' %}'">
                 Start Assessment
                 <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
             </button>
         </section>
-
-        <footer>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <span>•</span>
-                <a href="#">Terms of Service</a>
-                <span>•</span>
-                <a href="#">Help & Support</a>
-            </div>
-            <p>© 2026 EduPath. All rights reserved.</p>
-        </footer>
-
-    </main>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'assessment/base.html' %}
+{% load static %}
+
+{% block title %}EduPath | Aptitude Assessment Overview{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/aptitude-ready.css' %}">
+{% endblock %}
+
+{% block content %}
+        <div class="back-nav">
+            <a href="{% url 'dashboard' %}" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <section class="explainer-hero">
+            <div class="explainer-content">
+                <div class="explainer-badge">
+                    <i class="fa-solid fa-brain"></i> Phase 1: Aptitude Assessment
+                </div>
+                <h1 class="explainer-title">
+                    Discover Your Core <span>Cognitive Strengths</span>
+                </h1>
+                <p class="explainer-description">
+                    The EduPath Aptitude Assessment evaluates your natural talents, thinking styles, and behavioral preferences. It is built on proven psychological frameworks to help you understand what you're naturally good at.
+                </p>
+
+                <div class="quick-chips">
+                    <div class="chip">
+                        <i class="fa-regular fa-clock"></i> 25-30 Minutes
+                    </div>
+                    <div class="chip">
+                        <i class="fa-solid fa-list-check"></i> 6 Aptitude Domains
+                    </div>
+                    <div class="chip">
+                        <i class="fa-solid fa-chart-pie"></i> Instant Results
+                    </div>
+                </div>
+
+                <div class="begin-action">
+                    <button class="begin-btn" onclick="window.location.href='{% url 'assess_aptitude' %}'">
+                        Begin Aptitude Assessment
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-banner-image">
+                <div class="aptitude-badge-header">
+                    <span class="aptitude-pill">6 EVALUATION AREAS</span>
+                    <h3>What We Measure</h3>
+                </div>
+                <div class="aptitude-grid">
+                    <div class="aptitude-card num-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Number Facility</strong>
+                            <span>Math & Quant Logic</span>
+                        </div>
+                    </div>
+
+                    <div class="aptitude-card ded-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Deductive Reasoning</strong>
+                            <span>Rule-based Problem Solving</span>
+                        </div>
+                    </div>
+
+                    <div class="aptitude-card ind-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Inductive Reasoning</strong>
+                            <span>Pattern Recognition</span>
+                        </div>
+                    </div>
+
+                    <div class="aptitude-card sen-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Problem Sensitivity</strong>
+                            <span>Issue Spotting</span>
+                        </div>
+                    </div>
+
+                    <div class="aptitude-card vis-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Visualization</strong>
+                            <span>Spatial & 3D Shapes</span>
+                        </div>
+                    </div>
+
+                    <div class="aptitude-card ord-theme">
+                        <div class="aptitude-icon">
+                            <i class="fa-solid fa-list-ol"></i>
+                        </div>
+                        <div class="aptitude-text">
+                            <strong>Information Ordering</strong>
+                            <span>Sequencing & Logic</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

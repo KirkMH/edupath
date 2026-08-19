@@ -1,0 +1,106 @@
+{% extends 'assessment/base.html' %}
+{% load static %}
+
+{% block title %}EduPath | Preferences Assessment Overview{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/preference-ready.css' %}">
+{% endblock %}
+
+{% block content %}
+        <div class="back-nav">
+            <a href="{% url 'dashboard' %}" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <section class="explainer-hero">
+            <div class="explainer-content">
+                <div class="explainer-badge">
+                    <i class="fa-solid fa-user-check"></i> Phase 2: Preferences Assessment
+                </div>
+                <h1 class="explainer-title">
+                    Discover Your Core <span>Preferences</span>
+                </h1>
+                <p class="explainer-description">
+                    The EduPath Preferences Assessment evaluates your interest areas based on Holland's RIASEC model. It helps identify career environments and activities that bring you energy and satisfaction.
+                </p>
+
+                <div class="quick-chips">
+                    <div class="chip">
+                        <i class="fa-regular fa-clock"></i> 15-20 Minutes
+                    </div>
+                    <div class="chip">
+                        <i class="fa-solid fa-list-check"></i> 60 Statements
+                    </div>
+                    <div class="chip">
+                        <i class="fa-solid fa-chart-pie"></i> Instant Results
+                    </div>
+                </div>
+
+                <div class="begin-action">
+                    <button class="begin-btn" onclick="window.location.href='{% url 'assess_preference' %}'">
+                        Begin Preferences Assessment
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-banner-image">
+                <div class="riasec-badge-header">
+                    <span class="riasec-pill">HOLLAND CODES (RIASEC)</span>
+                    <h3>Interest Dimensions</h3>
+                </div>
+
+                <div class="riasec-grid">
+                    <div class="riasec-card r-theme">
+                        <div class="letter">R</div>
+                        <div class="riasec-text">
+                            <strong>Realistic</strong>
+                            <span>Doers • Hands-on</span>
+                        </div>
+                    </div>
+
+                    <div class="riasec-card i-theme">
+                        <div class="letter">I</div>
+                        <div class="riasec-text">
+                            <strong>Investigative</strong>
+                            <span>Thinkers • Research</span>
+                        </div>
+                    </div>
+
+                    <div class="riasec-card a-theme">
+                        <div class="letter">A</div>
+                        <div class="riasec-text">
+                            <strong>Artistic</strong>
+                            <span>Creators • Expression</span>
+                        </div>
+                    </div>
+
+                    <div class="riasec-card s-theme">
+                        <div class="letter">S</div>
+                        <div class="riasec-text">
+                            <strong>Social</strong>
+                            <span>Helpers • Community</span>
+                        </div>
+                    </div>
+
+                    <div class="riasec-card e-theme">
+                        <div class="letter">E</div>
+                        <div class="riasec-text">
+                            <strong>Enterprising</strong>
+                            <span>Persuaders • Leadership</span>
+                        </div>
+                    </div>
+
+                    <div class="riasec-card c-theme">
+                        <div class="letter">C</div>
+                        <div class="riasec-text">
+                            <strong>Conventional</strong>
+                            <span>Organizers • Detail</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}
