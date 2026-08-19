@@ -29,7 +29,7 @@
                 <span>Hi, {{ student_name|default:user.student_profile.full_name|default:user.first_name|default:user.username|default:"Student"|title }}!</span>
             </div>
 
-            <button class="sign-out" onclick="window.location.href='{% url 'signin' %}'">
+            <button class="sign-out" onclick="window.location.href='{% url 'signout' %}'">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Sign Out</span>
             </button>

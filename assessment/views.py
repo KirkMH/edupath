@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from .models import StudentProfile
 
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == 'POST':
         full_name = request.POST.get('fullName', '').strip()
         student_id = request.POST.get('studentId', '').strip()
@@ -104,9 +108,13 @@ def index(request):
 
 
 def signin(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == 'POST':
         login_id = request.POST.get('login_id', request.POST.get('email', '')).strip()
         password = request.POST.get('password', '')
+        remember_me = request.POST.get('rememberMe')
 
         if not login_id or not password:
             return render(request, 'signin.html', {
@@ -126,7 +134,12 @@ def signin(request):
         user = authenticate(request, username=username_to_auth, password=password)
         if user is not None:
             login(request, user)
-            return redirect('dashboard')
+            if remember_me:
+                request.session.set_expiry(1209600)  # 2 weeks
+            else:
+                request.session.set_expiry(0)  # Expire on browser close
+            next_url = request.GET.get('next', 'dashboard')
+            return redirect(next_url)
         else:
             return render(request, 'signin.html', {
                 'error': 'Invalid Student ID/Email address or password.',
@@ -136,6 +149,12 @@ def signin(request):
     return render(request, 'signin.html')
 
 
+def signout(request):
+    logout(request)
+    return redirect('signin')
+
+
+@login_required(login_url='signin')
 def dashboard(request):
     student_name = "Student"
     if request.user.is_authenticated:
@@ -155,22 +174,28 @@ def dashboard(request):
     })
 
 
+@login_required(login_url='signin')
 def aptitude_ready(request):
     return render(request, 'assessment/aptitude-ready.html')
 
 
+@login_required(login_url='signin')
 def assess_aptitude(request):
     return render(request, 'assessment/aptitude-assess.html')
 
 
+@login_required(login_url='signin')
 def preference_ready(request):
     return render(request, 'assessment/preference-ready.html')
 
 
+@login_required(login_url='signin')
 def assess_preference(request):
     return render(request, 'assessment/preference-assess.html')
 
 
+@login_required(login_url='signin')
 def result(request):
     return render(request, 'assessment/result.html')
+
 
