@@ -31,11 +31,23 @@
             <div class="form-card">
                 <h2>Sign In</h2>
                 <p class="sub-header">or <a href="{% url 'index' %}">Sign Up</a></p>
-                <form action="#" method="POST">
+                <form action="{% url 'signin' %}" method="POST">
+                    {% csrf_token %}
+
+                    {% if error %}
+                    <div class="error-card">
+                        <i class="fas fa-exclamation-circle error-card-icon"></i>
+                        <div class="error-card-body">
+                            <div class="error-card-title">Sign In Error</div>
+                            <p style="font-size: 0.825rem; color: #7f1d1d; margin: 0; line-height: 1.4;">{{ error }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="form-group">
                         <div class="input-wrapper">
-                            <i class="fas fa-envelope input-icon"></i>
-                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="login_id" name="login_id" placeholder="Enter your Student ID or Email address" value="{{ login_id|default:'' }}" required>
                         </div>
                     </div>
 

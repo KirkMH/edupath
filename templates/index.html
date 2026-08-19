@@ -31,18 +31,34 @@
             <div class="form-card">
                 <h2>Sign Up</h2>
                 <p class="sub-header">or <a href="{% url 'signin' %}">Sign In</a></p>
-                <form action="#" method="POST">
+                <form action="{% url 'index' %}" method="POST">
+                    {% csrf_token %}
+
+                    {% if errors %}
+                    <div class="error-card">
+                        <i class="fas fa-exclamation-circle error-card-icon"></i>
+                        <div class="error-card-body">
+                            <div class="error-card-title">Please correct the following issue{{ errors|length|pluralize }}:</div>
+                            <ul class="error-card-list">
+                                {% for error in errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="form-group">
                         <div class="input-wrapper">
                             <i class="fas fa-user input-icon"></i>
-                            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value="{{ form_data.fullName|default:'' }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="input-wrapper">
                             <i class="fas fa-id-card input-icon"></i>
-                            <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" required>
+                            <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" value="{{ form_data.studentId|default:'' }}" required>
                         </div>
                     </div>
 
@@ -50,7 +66,7 @@
                         <div class="form-group">
                             <div class="input-wrapper">
                                 <i class="fas fa-calendar-alt input-icon"></i>
-                                <input type="number" id="age" name="age" placeholder="Age" required min="1" max="120">
+                                <input type="number" id="age" name="age" placeholder="Age" value="{{ form_data.age|default:'' }}" required min="1" max="120">
                             </div>
                         </div>
 
@@ -58,9 +74,9 @@
                             <div class="input-wrapper">
                                 <i class="fas fa-venus-mars input-icon"></i>
                                 <select id="sex" name="sex" required>
-                                    <option value="" disabled selected>Select sex</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="" disabled {% if not form_data.sex %}selected{% endif %}>Select sex</option>
+                                    <option value="Male" {% if form_data.sex == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if form_data.sex == 'Female' %}selected{% endif %}>Female</option>
                                 </select>
                             </div>
                         </div>
@@ -69,7 +85,7 @@
                     <div class="form-group">
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-icon"></i>
-                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address (optional)" value="{{ form_data.email|default:'' }}">
                         </div>
                     </div>
 

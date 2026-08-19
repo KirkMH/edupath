@@ -8,7 +8,7 @@
             <div class="hero-content">
                 <h1 class="hero-title">
                     Welcome,<br>
-                    <span>Student!</span>
+                    <span>{{ student_name|default:user.student_profile.full_name|default:user.first_name|default:user.username|default:"Student"|title }}!</span>
                 </h1>
 
                 <p class="hero-description">

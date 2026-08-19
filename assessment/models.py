@@ -24,6 +24,8 @@ class StudentProfile(models.Model):
 
     class Meta:
         verbose_name_plural = "Student Profiles"
+        unique_together = ('full_name', 'student_id')
+
 
 
 class StudentAptitudeResponse(models.Model):
