@@ -3,6 +3,11 @@
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<link rel="icon" type="image/x-icon" href="{% static 'img/edupath-icon.png' %}">
+{% endblock %}
+
 {% block branding %}
 <div id="site-name" style="display: flex; align-items: center; gap: 10px; margin: 5px 0;">
     <img src="{% static 'img/edupath-icon.png' %}" alt="EduPath Logo" style="height: 30px; width: auto; vertical-align: middle;">
