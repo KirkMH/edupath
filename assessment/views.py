@@ -219,6 +219,8 @@ def preference_ready(request):
 
 @login_required(login_url='signin')
 def assess_preference(request):
+    if request.method == 'POST':
+        return redirect('result')
     return render(request, 'assessment/preference-assess.html')
 
 

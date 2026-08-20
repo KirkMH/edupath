@@ -21,7 +21,7 @@
         <h1 class="hero-title">Tell us what you prefer</h1>
         <p class="hero-desc">
           There are no right or wrong answers.<br>
-          Choose the option that describes you best for each of the 60 statements.
+          Choose the option that describes you best.
         </p>
       </div>
       <div class="hero-illustration">
@@ -56,146 +56,79 @@
     <div class="progress-card">
       <div class="progress-left">
         <h4>Overall Progress</h4>
-        <p>Question <span class="current" id="current-step-num">1</span> of <span class="total" id="total-step-num">{% if questions %}{{ questions|length }}{% else %}60{% endif %}</span></p>
+        <p>Question <span class="current">1</span> of <span class="total">1</span></p>
       </div>
       <div class="progress-right">
         <div class="progress-bar-container">
-          <div class="progress-bar-fill" id="progress-bar-fill" style="width: 1.67%;"></div>
+          <div class="progress-bar-fill" style="width: 100%;"></div>
         </div>
-        <div class="progress-percentage" id="progress-percentage">2%</div>
+        <div class="progress-percentage">100%</div>
       </div>
     </div>
 
-    <!-- Main Single Question Questionnaire Form -->
+    <!-- Main Questionnaire Form -->
     <form id="preference-assessment-form" method="POST" action="{% url 'assess_preference' %}">
       {% csrf_token %}
       
       <div class="mcq-container">
-        {% if questions %}
-          {% for question in questions %}
-          <!-- Question Item Step {{ forloop.counter }} -->
-          <div class="question-item-card question-step" data-step="{{ forloop.counter }}" style="{% if not forloop.first %}display: none;{% endif %}">
-            <div class="question-header">
-              <div class="question-meta">
-                <div class="badge-number">{{ forloop.counter }}</div>
-                <span class="category-tag">{% if question.riasec_area %}Area {{ question.riasec_area }}{% else %}Work Activity{% endif %}</span>
-              </div>
-            </div>
-            <div class="question-stem">
-              {{ question.question_text }}
-            </div>
-            <div class="likert-grid">
-              <label class="likert-card opt-strongly-dislike">
-                <input type="radio" name="question_{{ question.question_id }}" value="1">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-frown-open"></i></div>
-                <span class="likert-label">Strongly<br>Dislike</span>
-              </label>
-
-              <label class="likert-card opt-dislike">
-                <input type="radio" name="question_{{ question.question_id }}" value="2">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-frown"></i></div>
-                <span class="likert-label">Dislike</span>
-              </label>
-
-              <label class="likert-card opt-unsure">
-                <input type="radio" name="question_{{ question.question_id }}" value="3">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-meh"></i></div>
-                <span class="likert-label">Unsure</span>
-              </label>
-
-              <label class="likert-card opt-like">
-                <input type="radio" name="question_{{ question.question_id }}" value="4">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-smile"></i></div>
-                <span class="likert-label">Like</span>
-              </label>
-
-              <label class="likert-card opt-strongly-like">
-                <input type="radio" name="question_{{ question.question_id }}" value="5">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-grin-stars"></i></div>
-                <span class="likert-label">Strongly<br>Like</span>
-              </label>
+        <!-- Single Question Item Card -->
+        <div class="question-item-card">
+          <div class="question-header">
+            <div class="question-meta">
+              <div class="badge-number">1</div>
+              <span class="category-tag">Work Activity Preferences</span>
             </div>
           </div>
-          {% endfor %}
-        {% else %}
-          <!-- Prepared 60 Step Placeholders (Awaiting API Data) -->
-          {% for i in "x"|rjust:"60" %}
-          <div class="question-item-card question-step" data-step="{{ forloop.counter }}" style="{% if not forloop.first %}display: none;{% endif %}">
-            <div class="question-header">
-              <div class="question-meta">
-                <div class="badge-number">{{ forloop.counter }}</div>
-                <span class="category-tag">Work Activity Preferences</span>
-              </div>
-            </div>
-            <div class="question-stem">
-              {% if forloop.counter == 1 %}I enjoy solving complex problems and finding structured solutions.
-              {% elif forloop.counter == 2 %}I like organizing tasks, managing schedules, and planning team activities.
-              {% elif forloop.counter == 3 %}I enjoy working with financial data, spreadsheets, and numerical metrics.
-              {% elif forloop.counter == 4 %}I enjoy helping, teaching, and supporting others in achieving their goals.
-              {% elif forloop.counter == 5 %}I enjoy creative activities like writing, designing, or producing visual media.
-              {% elif forloop.counter == 6 %}I prefer learning by doing hands-on practical work with machines or tools.
-              {% else %}Statement item #{{ forloop.counter }}: I prefer engaging in activities aligned with this work theme.{% endif %}
-            </div>
-
-            <div class="likert-grid">
-              <label class="likert-card opt-strongly-dislike">
-                <input type="radio" name="q{{ forloop.counter }}" value="1">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-frown-open"></i></div>
-                <span class="likert-label">Strongly<br>Dislike</span>
-              </label>
-
-              <label class="likert-card opt-dislike">
-                <input type="radio" name="q{{ forloop.counter }}" value="2">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-frown"></i></div>
-                <span class="likert-label">Dislike</span>
-              </label>
-
-              <label class="likert-card opt-unsure">
-                <input type="radio" name="q{{ forloop.counter }}" value="3">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-meh"></i></div>
-                <span class="likert-label">Unsure</span>
-              </label>
-
-              <label class="likert-card opt-like">
-                <input type="radio" name="q{{ forloop.counter }}" value="4">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-smile"></i></div>
-                <span class="likert-label">Like</span>
-              </label>
-
-              <label class="likert-card opt-strongly-like">
-                <input type="radio" name="q{{ forloop.counter }}" value="5">
-                <div class="likert-icon-box"><i class="fa-solid fa-face-grin-stars"></i></div>
-                <span class="likert-label">Strongly<br>Like</span>
-              </label>
-            </div>
+          <div class="question-stem">
+            I enjoy solving complex problems and finding structured solutions.
           </div>
-          {% endfor %}
-        {% endif %}
+
+          <div class="likert-grid">
+            <label class="likert-card opt-strongly-dislike">
+              <input type="radio" name="q1" value="1">
+              <div class="likert-icon-box"><i class="fa-solid fa-face-frown-open"></i></div>
+              <span class="likert-label">Strongly<br>Dislike</span>
+            </label>
+
+            <label class="likert-card opt-dislike">
+              <input type="radio" name="q1" value="2">
+              <div class="likert-icon-box"><i class="fa-solid fa-face-frown"></i></div>
+              <span class="likert-label">Dislike</span>
+            </label>
+
+            <label class="likert-card opt-unsure">
+              <input type="radio" name="q1" value="3">
+              <div class="likert-icon-box"><i class="fa-solid fa-face-meh"></i></div>
+              <span class="likert-label">Unsure</span>
+            </label>
+
+            <label class="likert-card opt-like">
+              <input type="radio" name="q1" value="4">
+              <div class="likert-icon-box"><i class="fa-solid fa-face-smile"></i></div>
+              <span class="likert-label">Like</span>
+            </label>
+
+            <label class="likert-card opt-strongly-like">
+              <input type="radio" name="q1" value="5">
+              <div class="likert-icon-box"><i class="fa-solid fa-face-grin-stars"></i></div>
+              <span class="likert-label">Strongly<br>Like</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <!-- Navigation & Submit Bar -->
       <div class="pagination-bar">
-        <button type="button" class="btn-nav-prev" id="btn-prev" disabled>
+        <button type="button" class="btn-nav-prev" id="btn-prev" disabled style="opacity: 0.5; cursor: not-allowed;">
           <i class="fa-solid fa-arrow-left"></i>
           <span>Previous</span>
         </button>
 
-        <div class="page-numbers" id="page-numbers-container">
-          {% if questions %}
-            {% for question in questions %}
-            <span class="page-link {% if forloop.first %}active{% endif %}" data-step-target="{{ forloop.counter }}">{{ forloop.counter }}</span>
-            {% endfor %}
-          {% else %}
-            <span class="page-link active" id="current-page-badge">1</span>
-          {% endif %}
+        <div class="page-numbers">
+          <span class="page-link active">1</span>
         </div>
 
-        <button type="button" class="btn-nav-next" id="btn-next">
-          <span>Next</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-
-        <button type="submit" class="btn-nav-submit" id="btn-submit" disabled style="display: none;">
+        <button type="submit" class="btn-nav-submit" id="btn-submit" disabled>
           <span>Submit</span>
           <i class="fa-solid fa-check"></i>
         </button>
@@ -230,119 +163,26 @@
 {% block js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const steps = document.querySelectorAll('.question-step');
-    const totalSteps = steps.length;
-    if (totalSteps === 0) return;
-
-    let currentStep = 1;
-
-    const btnPrev = document.getElementById('btn-prev');
-    const btnNext = document.getElementById('btn-next');
-    const btnSubmit = document.getElementById('btn-submit');
-    const currentSpan = document.getElementById('current-step-num');
-    const totalSpan = document.getElementById('total-step-num');
-    const progressBarFill = document.getElementById('progress-bar-fill');
-    const progressPercentage = document.getElementById('progress-percentage');
     const form = document.getElementById('preference-assessment-form');
-    const currentPageBadge = document.getElementById('current-page-badge');
+    const btnSubmit = document.getElementById('btn-submit');
 
-    function checkAllAnswered() {
-        let answeredCount = 0;
-        steps.forEach(stepEl => {
-            const radios = stepEl.querySelectorAll('input[type="radio"]');
-            const isAnswered = Array.from(radios).some(r => r.checked);
-            if (isAnswered) {
-                answeredCount++;
-            }
-        });
-        return answeredCount === totalSteps;
+    function checkAnswered() {
+        const radios = form.querySelectorAll('input[type="radio"]');
+        return Array.from(radios).some(r => r.checked);
     }
 
-    function updateView() {
-        // Show active step
-        steps.forEach(stepEl => {
-            const stepNum = parseInt(stepEl.getAttribute('data-step'), 10);
-            if (stepNum === currentStep) {
-                stepEl.style.display = 'block';
-            } else {
-                stepEl.style.display = 'none';
-            }
-        });
-
-        if (currentPageBadge) {
-            currentPageBadge.textContent = currentStep;
-        }
-
-        // Update progress card
-        if (currentSpan) currentSpan.textContent = currentStep;
-        if (totalSpan) totalSpan.textContent = totalSteps;
-
-        const percent = Math.round((currentStep / totalSteps) * 100);
-        if (progressBarFill) progressBarFill.style.width = percent + '%';
-        if (progressPercentage) progressPercentage.textContent = percent + '%';
-
-        // Update Prev button
-        if (currentStep === 1) {
-            btnPrev.disabled = true;
-            btnPrev.style.opacity = '0.5';
-            btnPrev.style.cursor = 'not-allowed';
-        } else {
-            btnPrev.disabled = false;
-            btnPrev.style.opacity = '1';
-            btnPrev.style.cursor = 'pointer';
-        }
-
-        // Update Next vs Submit button
-        if (currentStep === totalSteps) {
-            btnNext.style.display = 'none';
-            btnSubmit.style.display = 'inline-flex';
-
-            const isComplete = checkAllAnswered();
-            btnSubmit.disabled = !isComplete;
-            if (!isComplete) {
-                btnSubmit.setAttribute('title', 'Please answer all questions before submitting.');
-            } else {
-                btnSubmit.removeAttribute('title');
-            }
-        } else {
-            btnNext.style.display = 'inline-flex';
-            btnSubmit.style.display = 'none';
-        }
-    }
-
-    // Previous Button click
-    btnPrev.addEventListener('click', function() {
-        if (currentStep > 1) {
-            currentStep--;
-            updateView();
-            window.scrollTo({ top: 150, behavior: 'smooth' });
-        }
-    });
-
-    // Next Button click
-    btnNext.addEventListener('click', function() {
-        if (currentStep < totalSteps) {
-            currentStep++;
-            updateView();
-            window.scrollTo({ top: 150, behavior: 'smooth' });
-        }
-    });
-
-    // Listen for choice changes to re-evaluate submit state
     form.addEventListener('change', function() {
-        if (currentStep === totalSteps) {
-            const isComplete = checkAllAnswered();
-            btnSubmit.disabled = !isComplete;
-            if (!isComplete) {
-                btnSubmit.setAttribute('title', 'Please answer all questions before submitting.');
-            } else {
-                btnSubmit.removeAttribute('title');
-            }
+        const isAnswered = checkAnswered();
+        btnSubmit.disabled = !isAnswered;
+        if (!isAnswered) {
+            btnSubmit.setAttribute('title', 'Please select an option before submitting.');
+        } else {
+            btnSubmit.removeAttribute('title');
         }
     });
 
-    // Initial render
-    updateView();
+    // Initial check
+    btnSubmit.disabled = !checkAnswered();
 });
 </script>
 {% endblock %}
