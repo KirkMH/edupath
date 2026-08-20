@@ -1,0 +1,452 @@
+/* ==========================================
+   EduPath Common Assessment Stylesheet
+   ========================================== */
+
+/* ---------------- Back Navigation ---------------- */
+.back-nav {
+    margin-bottom: 24px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--primary-dark);
+    transform: translateX(-3px);
+}
+
+/* ---------------- Assessment Hero Header Section ---------------- */
+.hero-section {
+    background: var(--white);
+    border: 1px solid #e8eef4;
+    border-radius: 20px;
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(16, 42, 67, 0.03);
+}
+
+.hero-section .hero-content {
+    max-width: 520px;
+}
+
+.hero-section .badge {
+    display: inline-block;
+    background: var(--light-blue);
+    color: var(--primary-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+}
+
+.hero-section .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e1effe;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+}
+
+.hero-section .hero-title {
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.hero-section .hero-desc {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+.hero-section .hero-illustration {
+    position: relative;
+    width: 220px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------- Explainer Hero Section (Ready / Overview Pages) ---------------- */
+.explainer-hero {
+    background: var(--white);
+    border: 1px solid #e8eef4;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 5px 20px rgba(16, 42, 67, 0.04);
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.explainer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--light-blue);
+    color: var(--primary-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.explainer-title {
+    font-size: clamp(28px, 3.5vw, 38px);
+    line-height: 1.15;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.explainer-title span {
+    color: var(--primary-dark);
+}
+
+.explainer-description {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.chip i {
+    color: var(--primary-dark);
+}
+
+.begin-action {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.begin-btn {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.begin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.45);
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+}
+
+.hero-banner-image {
+    width: 100%;
+    min-height: 330px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+    border: 1px solid #334155;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-banner-image::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ---------------- Progress Card ---------------- */
+.progress-card {
+    background: var(--white);
+    border: 1px solid #e8eef4;
+    border-radius: 16px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(16, 42, 67, 0.03);
+}
+
+.progress-left h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+.progress-left p {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.progress-left span.current {
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+
+.progress-left span.total {
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.progress-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 60%;
+}
+
+.progress-bar-container {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--primary-dark);
+    border-radius: 999px;
+}
+
+.progress-percentage {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    min-width: 45px;
+}
+
+/* ---------------- Pagination Navigation Bar ---------------- */
+.pagination-bar {
+    background: var(--white);
+    border: 1px solid #e8eef4;
+    border-radius: 16px;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(16, 42, 67, 0.03);
+}
+
+.btn-nav-prev {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-nav-prev:hover {
+    background: var(--light-blue);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-link {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--navy);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.page-link:hover:not(.active) {
+    background: var(--light-blue);
+    color: var(--primary-dark);
+}
+
+.page-link.active {
+    background: var(--primary-dark);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.btn-nav-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-dark);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    transition: all 0.2s;
+}
+
+.btn-nav-next:hover {
+    background: #0284c7;
+    transform: translateY(-1px);
+}
+
+/* ---------------- Bottom Info Banner ---------------- */
+.info-banner {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    z-index: 1;
+}
+
+.info-icon-wrapper {
+    width: 46px;
+    height: 46px;
+    background: var(--primary-dark);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+}
+
+.info-text h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 3px;
+}
+
+.info-text p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.info-graphic {
+    position: relative;
+    height: 60px;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* ---------------- Media Queries ---------------- */
+@media (max-width: 900px) {
+    .explainer-hero {
+        grid-template-columns: 1fr;
+        padding: 28px;
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section .hero-illustration {
+        display: none;
+    }
+    .hero-section {
+        padding: 24px;
+    }
+    .progress-right {
+        width: 50%;
+    }
+    .page-numbers {
+        gap: 4px;
+    }
+    .page-link {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}

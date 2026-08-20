@@ -1,0 +1,99 @@
+/* Preference Ready Overview Styles */
+.riasec-badge-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.riasec-pill {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 6px;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.riasec-badge-header h3 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.riasec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.riasec-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.riasec-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.riasec-card .letter {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.r-theme .letter { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.i-theme .letter { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.a-theme .letter { background: linear-gradient(135deg, #ec4899, #db2777); }
+.s-theme .letter { background: linear-gradient(135deg, #10b981, #059669); }
+.e-theme .letter { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.c-theme .letter { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+.riasec-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.riasec-text strong {
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.riasec-text span {
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+@media (max-width: 900px) {
+    .riasec-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .riasec-grid {
+        grid-template-columns: 1fr;
+    }
+}
