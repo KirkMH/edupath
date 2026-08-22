@@ -294,6 +294,29 @@
     margin-bottom: 0;
 }
 
+.pagination-bar .page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 500px;
+    overflow-x: auto;
+    padding: 6px 4px;
+    scrollbar-width: thin;
+}
+
+.pagination-bar .page-numbers::-webkit-scrollbar {
+    height: 4px;
+}
+
+.pagination-bar .page-numbers::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.pagination-bar .page-link {
+    flex-shrink: 0;
+}
+
 /* ---------------- 1-Question-at-a-Time Likert Card Styles ---------------- */
 .likert-grid {
     display: grid;
@@ -374,6 +397,34 @@
 .likert-card.opt-strongly-like:has(input:checked) .likert-icon-box { background: #10b981; color: #ffffff; border-color: #059669; }
 
 /* Navigation buttons */
+.btn-nav-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background: #35a84a;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(53, 168, 74, 0.25);
+    transition: all 0.2s;
+}
+
+.btn-nav-next:hover:not(:disabled) {
+    background: #2f963f;
+    transform: translateY(-1px);
+}
+
+.btn-nav-next:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.65;
+}
+
 .btn-nav-submit {
     display: inline-flex;
     align-items: center;

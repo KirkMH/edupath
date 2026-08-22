@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Program, AptitudeQuestion, ProgramCriteria, Rule, ScoreInterpretation
+from .models import Program, AptitudeQuestion, ProgramCriteria, Rule, ScoreInterpretation, InterestQuestion
 
 from django.contrib.auth.models import Group
 
@@ -54,3 +54,13 @@ class ScoreInterpretationAdmin(admin.ModelAdmin):
     ordering = ('order', 'min_score')
 
 
+@admin.register(InterestQuestion)
+class InterestQuestionAdmin(admin.ModelAdmin):
+    list_display = ('item_number', 'riasec_area', 'question_text_short', 'status', 'created_at')
+    list_filter = ('riasec_area', 'status')
+    search_fields = ('question_text', 'item_number')
+    ordering = ('item_number',)
+
+    def question_text_short(self, obj):
+        return obj.question_text[:50] + "..." if len(obj.question_text) > 50 else obj.question_text
+    question_text_short.short_description = 'Question Text'

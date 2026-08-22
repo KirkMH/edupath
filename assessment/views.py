@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from customization.models import AptitudeQuestion
-from .models import StudentProfile, StudentAptitudeResponse
+from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse
+from .services import sync_interest_questions
 
 
 def index(request):
@@ -254,9 +255,34 @@ def preference_ready(request):
 
 @login_required(login_url='signin')
 def assess_preference(request):
+    student_profile = request.user.student_profile
+    questions = sync_interest_questions()
+
     if request.method == 'POST':
+        for question in questions:
+            rating_val = request.POST.get(f'q_{question.question_id}')
+            if rating_val and rating_val.isdigit():
+                rating_int = int(rating_val)
+                if 1 <= rating_int <= 5:
+                    StudentInterestResponse.objects.update_or_create(
+                        student=student_profile,
+                        question=question,
+                        defaults={'rating': rating_int}
+                    )
+        student_profile.last_date_taken = timezone.now()
+        student_profile.save()
         return redirect('result')
-    return render(request, 'assessment/preference-assess.html')
+
+    existing_responses = StudentInterestResponse.objects.filter(student=student_profile)
+    user_answers = {resp.question_id: resp.rating for resp in existing_responses}
+
+    import json
+    return render(request, 'assessment/preference-assess.html', {
+        'questions': questions,
+        'user_answers': user_answers,
+        'user_answers_json': json.dumps(user_answers),
+        'total_questions': len(questions) or 60,
+    })
 
 
 @login_required(login_url='signin')

@@ -2,23 +2,26 @@
 .hero {
     min-height: 380px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 3fr;
     align-items: center;
-    gap: 50px;
+    gap: 0;
     margin-bottom: 45px;
 }
 
 .hero-content {
     padding-left: 8px;
+    position: relative;
+    z-index: 2;
+    margin-right: -70px;
 }
 
 .hero-title {
-    font-size: clamp(42px, 5vw, 58px);
-    line-height: 1.08;
-    letter-spacing: -2px;
+    font-size: clamp(32px, 3.5vw, 46px);
+    line-height: 1.1;
+    letter-spacing: -1.5px;
     color: var(--navy-900);
     font-weight: 700;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
 }
 
 .hero-title span {
@@ -26,10 +29,10 @@
 }
 
 .hero-description {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--text-muted);
-    max-width: 430px;
-    margin-bottom: 30px;
+    max-width: 100%;
+    margin-bottom: 24px;
 }
 
 .today-card {
@@ -286,6 +289,7 @@
     }
     .hero-content {
         padding: 0;
+        margin-right: 0;
     }
     .hero-description {
         margin-left: auto;

@@ -25,13 +25,13 @@
         <div class="hero-progress">
           <div class="progress-left">
             <h4>Overall Progress</h4>
-            <p>Question <span class="current">1</span> of <span class="total">1</span></p>
+            <p>Question <span class="current" id="current-q-num">1</span> of <span class="total" id="total-q-num">{{ total_questions }}</span></p>
           </div>
           <div class="progress-right">
             <div class="progress-bar-container">
-              <div class="progress-bar-fill" style="width: 100%;"></div>
+              <div class="progress-bar-fill" id="progress-fill" style="width: 1.67%;"></div>
             </div>
-            <div class="progress-percentage">100%</div>
+            <div class="progress-percentage" id="progress-text">2%</div>
           </div>
         </div>
       </div>
@@ -42,50 +42,64 @@
       {% csrf_token %}
       
       <div class="mcq-container">
+        {% for q in questions %}
         <!-- Single Question Item Card -->
-        <div class="question-item-card">
+        <div class="question-item-card" data-question-step="{{ forloop.counter }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
           <div class="question-header">
             <div class="question-meta">
-              <div class="badge-number">1</div>
-              <span class="category-tag">Work Activity Preferences</span>
+              <div class="badge-number">{{ q.item_number }}</div>
+              <span class="category-tag">
+                {% if q.riasec_area == 'R' %}Realistic Work Activity
+                {% elif q.riasec_area == 'I' %}Investigative Work Activity
+                {% elif q.riasec_area == 'A' %}Artistic Work Activity
+                {% elif q.riasec_area == 'S' %}Social Work Activity
+                {% elif q.riasec_area == 'E' %}Enterprising Work Activity
+                {% elif q.riasec_area == 'C' %}Conventional Work Activity
+                {% else %}Work Activity Preference{% endif %}
+              </span>
             </div>
           </div>
           <div class="question-stem">
-            I enjoy solving complex problems and finding structured solutions.
+            {{ q.question_text }}
           </div>
 
           <div class="likert-grid">
             <label class="likert-card opt-strongly-dislike">
-              <input type="radio" name="q1" value="1">
+              <input type="radio" name="q_{{ q.question_id }}" value="1">
               <div class="likert-icon-box"><i class="fa-solid fa-face-frown-open"></i></div>
               <span class="likert-label">Strongly<br>Dislike</span>
             </label>
 
             <label class="likert-card opt-dislike">
-              <input type="radio" name="q1" value="2">
+              <input type="radio" name="q_{{ q.question_id }}" value="2">
               <div class="likert-icon-box"><i class="fa-solid fa-face-frown"></i></div>
               <span class="likert-label">Dislike</span>
             </label>
 
             <label class="likert-card opt-unsure">
-              <input type="radio" name="q1" value="3">
+              <input type="radio" name="q_{{ q.question_id }}" value="3">
               <div class="likert-icon-box"><i class="fa-solid fa-face-meh"></i></div>
               <span class="likert-label">Unsure</span>
             </label>
 
             <label class="likert-card opt-like">
-              <input type="radio" name="q1" value="4">
+              <input type="radio" name="q_{{ q.question_id }}" value="4">
               <div class="likert-icon-box"><i class="fa-solid fa-face-smile"></i></div>
               <span class="likert-label">Like</span>
             </label>
 
             <label class="likert-card opt-strongly-like">
-              <input type="radio" name="q1" value="5">
+              <input type="radio" name="q_{{ q.question_id }}" value="5">
               <div class="likert-icon-box"><i class="fa-solid fa-face-grin-stars"></i></div>
               <span class="likert-label">Strongly<br>Like</span>
             </label>
           </div>
         </div>
+        {% empty %}
+        <div class="question-item-card">
+          <p style="text-align: center; padding: 20px; color: var(--text-muted);">No preference questions available right now.</p>
+        </div>
+        {% endfor %}
       </div>
 
       <!-- Navigation & Submit Bar -->
@@ -95,12 +109,19 @@
           <span>Previous</span>
         </button>
 
-        <div class="page-numbers">
-          <span class="page-link active">1</span>
+        <div class="page-numbers" id="page-numbers-container">
+          {% for q in questions %}
+          <span class="page-link {% if forloop.first %}active{% endif %}" data-step-target="{{ forloop.counter }}">{{ forloop.counter }}</span>
+          {% endfor %}
         </div>
 
-        <button type="submit" class="btn-nav-submit" id="btn-submit" disabled>
-          <span>Submit</span>
+        <button type="button" class="btn-nav-next" id="btn-next" style="display: inline-flex;">
+          <span>Next</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button type="submit" class="btn-nav-submit" id="btn-submit" style="display: none;">
+          <span>Submit Assessment</span>
           <i class="fa-solid fa-check"></i>
         </button>
       </div>
@@ -135,25 +156,147 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('preference-assessment-form');
+    const cards = document.querySelectorAll('.question-item-card[data-question-step]');
+    const totalSteps = cards.length;
+
+    const currentQNum = document.getElementById('current-q-num');
+    const totalQNum = document.getElementById('total-q-num');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const pageLinks = document.querySelectorAll('.page-link');
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
     const btnSubmit = document.getElementById('btn-submit');
 
-    function checkAnswered() {
-        const radios = form.querySelectorAll('input[type="radio"]');
+    const userAnswers = {{ user_answers_json|safe }};
+    let currentStep = 1;
+
+    // Pre-fill existing user answers
+    for (const [qId, rating] of Object.entries(userAnswers)) {
+        const radio = form.querySelector(`input[name="q_${qId}"][value="${rating}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
+    }
+
+    function isStepAnswered(step) {
+        const activeCard = form.querySelector(`.question-item-card[data-question-step="${step}"]`);
+        if (!activeCard) return false;
+        const radios = activeCard.querySelectorAll('input[type="radio"]');
         return Array.from(radios).some(r => r.checked);
     }
 
-    form.addEventListener('change', function() {
-        const isAnswered = checkAnswered();
-        btnSubmit.disabled = !isAnswered;
-        if (!isAnswered) {
-            btnSubmit.setAttribute('title', 'Please select an option before submitting.');
+    function updateStepView() {
+        cards.forEach(card => {
+            const step = parseInt(card.getAttribute('data-question-step'), 10);
+            card.style.display = (step === currentStep) ? 'block' : 'none';
+        });
+
+        // Update page number active buttons
+        pageLinks.forEach(link => {
+            const linkStep = parseInt(link.getAttribute('data-step-target'), 10);
+            if (linkStep === currentStep) {
+                link.classList.add('active');
+                if (typeof link.scrollIntoView === 'function') {
+                    link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        // Update progress counts
+        if (currentQNum) currentQNum.textContent = currentStep;
+        if (totalQNum) totalQNum.textContent = totalSteps;
+
+        const percent = Math.round((currentStep / totalSteps) * 100);
+        if (progressFill) progressFill.style.width = percent + '%';
+        if (progressText) progressText.textContent = percent + '%';
+
+        // Prev Button state
+        if (currentStep === 1) {
+            btnPrev.disabled = true;
+            btnPrev.style.opacity = '0.5';
+            btnPrev.style.cursor = 'not-allowed';
         } else {
-            btnSubmit.removeAttribute('title');
+            btnPrev.disabled = false;
+            btnPrev.style.opacity = '1';
+            btnPrev.style.cursor = 'pointer';
+        }
+
+        const answered = isStepAnswered(currentStep);
+
+        // Next & Submit Button visibility
+        if (currentStep < totalSteps) {
+            btnNext.style.display = 'inline-flex';
+            btnSubmit.style.display = 'none';
+
+            btnNext.disabled = !answered;
+            btnNext.style.opacity = answered ? '1' : '0.5';
+            btnNext.style.cursor = answered ? 'pointer' : 'not-allowed';
+        } else {
+            btnNext.style.display = 'none';
+            btnSubmit.style.display = 'inline-flex';
+
+            btnSubmit.disabled = !answered;
+            btnSubmit.style.opacity = answered ? '1' : '0.5';
+            btnSubmit.style.cursor = answered ? 'pointer' : 'not-allowed';
+        }
+    }
+
+    // Previous Button Click
+    btnPrev.addEventListener('click', function() {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
-    // Initial check
-    btnSubmit.disabled = !checkAnswered();
+    // Next Button Click
+    btnNext.addEventListener('click', function() {
+        if (currentStep < totalSteps && isStepAnswered(currentStep)) {
+            currentStep++;
+            updateStepView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    // Direct page link click
+    pageLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const targetStep = parseInt(this.getAttribute('data-step-target'), 10);
+            if (targetStep >= 1 && targetStep <= totalSteps) {
+                currentStep = targetStep;
+                updateStepView();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Keyboard Arrow Left & Arrow Right Navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+            if (!btnPrev.disabled && currentStep > 1) {
+                btnPrev.click();
+            }
+        } else if (e.key === 'ArrowRight') {
+            if (btnNext.style.display !== 'none' && !btnNext.disabled) {
+                btnNext.click();
+            }
+        }
+    });
+
+    // Option change listener
+    form.addEventListener('change', function(e) {
+        if (e.target.matches('input[type="radio"]')) {
+            updateStepView();
+        }
+    });
+
+    // Initial render
+    updateStepView();
 });
 </script>
 {% endblock %}

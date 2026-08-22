@@ -275,3 +275,47 @@ footer {
     color: #991b1b;
     line-height: 1.3;
 }
+
+/* Credit Banner */
+.credit-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    margin-top: 24px;
+    margin-bottom: 0px;
+}
+
+.credit-icon-box {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.credit-icon-box img {
+    height: 36px;
+    width: auto;
+    max-width: 110px;
+    object-fit: contain;
+    display: block;
+}
+
+.credit-text {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+.credit-text a {
+    color: var(--primary-dark);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.credit-text a:hover {
+    color: var(--primary);
+}
