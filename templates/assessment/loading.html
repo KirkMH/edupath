@@ -1,0 +1,177 @@
+{% extends 'assessment/base.html' %}
+{% load static %}
+
+{% block title %}EduPath | Processing Your Results{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/loading.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="loading-container">
+  <!-- Hero Loader Card -->
+  <section class="loader-card">
+    <div class="loader-header">
+      <div class="badge">EVALUATION IN PROGRESS</div>
+      <h2 class="loader-title">Analyzing Your Assessment Profile</h2>
+      <p class="loader-subtitle">Please stay on this page while we process your responses and generate recommendations.</p>
+    </div>
+
+    <!-- Animated Central Ring & Icon Loader -->
+    <div class="visual-spinner-box">
+      <div class="ring-outer"></div>
+      <div class="ring-inner"></div>
+      <div class="center-icon-glow" id="center-icon">
+        <i class="fa-solid fa-database"></i>
+      </div>
+    </div>
+
+    <!-- Progress Bar & Percentage Counter -->
+    <div class="progress-meta-row">
+      <span class="progress-label" id="current-stage-title">Saving assessment responses...</span>
+      <span class="progress-percent-badge" id="progress-percent">0%</span>
+    </div>
+
+    <div class="progress-track-wrapper">
+      <div class="progress-track-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Completion Announcement Banner -->
+    <div class="completion-banner" id="completion-banner">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Evaluation Complete! Navigating to your personalized results...</span>
+    </div>
+  </section>
+
+  <!-- Interactive Insights & Educational Tips Card -->
+  <section class="tips-card">
+    <div class="tip-content-group">
+      <div class="tip-badge-icon">
+        <i class="fa-solid fa-lightbulb"></i>
+      </div>
+      <div class="tip-text-body">
+        <span class="tip-tag">Career Insight Tip</span>
+        <p class="tip-quote" id="tip-quote-text">
+          Did you know? Matching both your cognitive aptitude and personal work interests leads to higher career satisfaction and academic success.
+        </p>
+      </div>
+    </div>
+
+    <button type="button" class="tip-action-btn" id="next-tip-btn">
+      <span>Next Insight</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </section>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Array of educational and career insights for interactivity
+    const insights = [
+        "Did you know? Matching both your cognitive aptitude and personal work interests leads to higher career satisfaction and academic success.",
+        "The Holland Codes (RIASEC) framework classifies work environments into Realistic, Investigative, Artistic, Social, Enterprising, and Conventional fields.",
+        "Your aptitude score reflects logical speed and quantitative accuracy, complementing your passion and preference profile.",
+        "EduPath analyzes multi-dimensional academic alignment to recommend degree programs uniquely suited to your talents."
+    ];
+
+    let currentTipIndex = 0;
+    const tipQuoteText = document.getElementById('tip-quote-text');
+    const nextTipBtn = document.getElementById('next-tip-btn');
+
+    if (nextTipBtn && tipQuoteText) {
+        nextTipBtn.addEventListener('click', function() {
+            currentTipIndex = (currentTipIndex + 1) % insights.length;
+            tipQuoteText.style.opacity = '0';
+            setTimeout(() => {
+                tipQuoteText.textContent = insights[currentTipIndex];
+                tipQuoteText.style.opacity = '1';
+            }, 200);
+        });
+    }
+
+    // Evaluation Stage Steps Configuration
+    const stepsData = [
+        { id: 1, title: "Saving your assessment responses...", icon: "fa-database", targetPct: 20 },
+        { id: 2, title: "Evaluating your aptitude test results...", icon: "fa-chart-pie", targetPct: 40 },
+        { id: 3, title: "Assessing your career preference profile...", icon: "fa-compass", targetPct: 60 },
+        { id: 4, title: "Analyzing your overall results...", icon: "fa-brain", targetPct: 80 },
+        { id: 5, title: "Preparing your recommended courses...", icon: "fa-graduation-cap", targetPct: 100 }
+    ];
+
+    const centerIcon = document.getElementById('center-icon');
+    const stageTitle = document.getElementById('current-stage-title');
+    const percentBadge = document.getElementById('progress-percent');
+    const progressFill = document.getElementById('progress-fill');
+    const completionBanner = document.getElementById('completion-banner');
+
+    let currentStepIndex = 0;
+    let currentPct = 0;
+    const stepDurationMs = 1000; // time per step stage (5 seconds total)
+
+    function updateCenterIcon(iconClass) {
+        if (centerIcon) {
+            centerIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+        }
+    }
+
+    function animateProgress(fromPct, toPct, duration, onComplete) {
+        const startTime = performance.now();
+        function step(timestamp) {
+            const elapsed = timestamp - startTime;
+            const progressRatio = Math.min(elapsed / duration, 1);
+            const val = Math.round(fromPct + (toPct - fromPct) * progressRatio);
+            
+            if (percentBadge) percentBadge.textContent = val + '%';
+            if (progressFill) progressFill.style.width = val + '%';
+
+            if (progressRatio < 1) {
+                requestAnimationFrame(step);
+            } else {
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    function processStep(index) {
+        if (index >= stepsData.length) {
+            // All steps completed!
+            if (stageTitle) stageTitle.textContent = "All evaluations completed successfully!";
+            if (completionBanner) completionBanner.style.display = 'flex';
+            
+            // Navigate automatically to the results page after a brief pause
+            setTimeout(function() {
+                window.location.href = "{% url 'result' %}";
+            }, 1200);
+            return;
+        }
+
+        const stepObj = stepsData[index];
+
+        // Update Stage Text & Center Spinner Icon
+        if (stageTitle) stageTitle.textContent = stepObj.title;
+        updateCenterIcon(stepObj.icon);
+
+        // Animate percentage bar
+        const startPct = currentPct;
+        const targetPct = stepObj.targetPct;
+        animateProgress(startPct, targetPct, stepDurationMs, function() {
+            currentPct = targetPct;
+
+            // Move to next step
+            currentStepIndex++;
+            setTimeout(() => {
+                processStep(currentStepIndex);
+            }, 200);
+        });
+    }
+
+    // Start evaluation animation sequence
+    setTimeout(function() {
+        processStep(0);
+    }, 400);
+});
+</script>
+{% endblock %}

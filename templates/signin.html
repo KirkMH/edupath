@@ -41,6 +41,13 @@
         </div>
         {% endif %}
 
+        {% if success %}
+        <div class="success-card">
+            <i class="fas fa-circle-check success-card-icon"></i>
+            <span class="success-card-text">{{ success }}</span>
+        </div>
+        {% endif %}
+
         <form action="{% url 'signin' %}" method="POST" class="login-form">
             {% csrf_token %}
 
@@ -62,7 +69,7 @@
                 <label class="remember-label">
                     <input type="checkbox" id="rememberMe" name="rememberMe"> Remember me
                 </label>
-                <a href="#" class="forgot-link">Forgot password?</a>
+                <a href="{% url 'forgot_password' %}" class="forgot-link">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn-submit">

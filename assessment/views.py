@@ -142,6 +142,10 @@ def signin(request):
             return redirect('/admin/')
         return redirect('dashboard')
 
+    success = None
+    if request.GET.get('reset') == 'success':
+        success = "Password updated successfully! Please sign in with your new password."
+
     if request.method == 'POST':
         login_id = request.POST.get('login_id', request.POST.get('username', request.POST.get('email', ''))).strip()
         password = request.POST.get('password', '')
@@ -150,7 +154,8 @@ def signin(request):
         if not login_id or not password:
             return render(request, 'signin.html', {
                 'error': 'Please provide your Username, Student ID, or Email and password.',
-                'login_id': login_id
+                'login_id': login_id,
+                'success': success,
             })
 
         # Find user by username (student_id / admin username) or email
@@ -181,10 +186,99 @@ def signin(request):
         else:
             return render(request, 'signin.html', {
                 'error': 'Invalid Username/Student ID/Email address or password.',
-                'login_id': login_id
+                'login_id': login_id,
+                'success': success,
             })
 
-    return render(request, 'signin.html')
+    return render(request, 'signin.html', {'success': success})
+
+
+def forgot_password(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
+        return redirect('dashboard')
+
+    error = None
+    step = 1
+    form_data = {}
+
+    if request.method == 'POST':
+        action_step = request.POST.get('step', '1')
+
+        if action_step == '1':
+            student_id = request.POST.get('studentId', '').strip()
+            security_question = request.POST.get('securityQuestion', '').strip()
+            security_answer = request.POST.get('securityAnswer', '').strip()
+
+            form_data = {
+                'studentId': student_id,
+                'securityQuestion': security_question,
+                'securityAnswer': security_answer,
+            }
+
+            if not student_id:
+                error = "Learner's Reference Number (LRN) is required."
+            elif not student_id.isdigit() or len(student_id) != 12:
+                error = "Learner's Reference Number (LRN) must be exactly a 12-digit number."
+            elif not security_question:
+                error = "Please select your security question."
+            elif not security_answer:
+                error = "Security answer is required."
+            else:
+                try:
+                    profile = StudentProfile.objects.get(student_id__iexact=student_id)
+                    if (profile.security_question == security_question and
+                        profile.security_answer and
+                        profile.security_answer.strip().lower() == security_answer.strip().lower()):
+                        # Verification successful! Advance to Step 2.
+                        request.session['reset_student_id'] = profile.student_id
+                        step = 2
+                    else:
+                        error = "The security question or answer does not match our records."
+                except StudentProfile.DoesNotExist:
+                    error = "No student account found with the provided LRN."
+
+        elif action_step == '2':
+            reset_student_id = request.session.get('reset_student_id')
+            if not reset_student_id:
+                error = "Session expired or invalid verification state. Please verify your details again."
+                step = 1
+            else:
+                password = request.POST.get('password', '')
+                confirm_password = request.POST.get('confirmPassword', '')
+
+                if not password:
+                    error = "New password is required."
+                    step = 2
+                elif not confirm_password:
+                    error = "Please re-enter your new password."
+                    step = 2
+                elif password != confirm_password:
+                    error = "Passwords do not match."
+                    step = 2
+                else:
+                    try:
+                        profile = StudentProfile.objects.get(student_id=reset_student_id)
+                        user = profile.user
+                        user.set_password(password)
+                        user.save()
+
+                        if 'reset_student_id' in request.session:
+                            del request.session['reset_student_id']
+
+                        return redirect('/signin/?reset=success')
+                    except (StudentProfile.DoesNotExist, User.DoesNotExist):
+                        error = "User account not found. Please try again."
+                        step = 1
+
+    return render(request, 'forgot_password.html', {
+        'error': error,
+        'step': step,
+        'form_data': form_data,
+        'student_id': request.session.get('reset_student_id', '') if step == 2 else ''
+    })
+
 
 
 def signout(request):
@@ -271,7 +365,7 @@ def assess_preference(request):
                     )
         student_profile.last_date_taken = timezone.now()
         student_profile.save()
-        return redirect('result')
+        return redirect('loading')
 
     existing_responses = StudentInterestResponse.objects.filter(student=student_profile)
     user_answers = {resp.question_id: resp.rating for resp in existing_responses}
@@ -283,6 +377,11 @@ def assess_preference(request):
         'user_answers_json': json.dumps(user_answers),
         'total_questions': len(questions) or 60,
     })
+
+
+@login_required(login_url='signin')
+def loading(request):
+    return render(request, 'assessment/loading.html')
 
 
 @login_required(login_url='signin')
