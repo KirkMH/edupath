@@ -1,121 +1,63 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPath - Smart Assessment. Confident Career Choices.</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-icon.png' %}">
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google Fonts - Inter for clean typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/asu-logo.jpg' %}">
+
+    <title>EduPath - Course Recommendation System</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- Auth CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-<body>
-    <div class="page-container">
-        <!-- Left Column (Hero Info) -->
-        <div class="left-column">
-            <div class="logo-container">
-                <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo">
-            </div>
-            <p class="description">
-                Welcome to EduPath. Your future, clearly defined. We provide smart, personalized assessments and career pathing tools to help you navigate your academic journey with confidence.
-            </p>
+
+<body class="auth-body">
+
+    <main class="landing-card">
+
+        <img
+            src="static/img/asu-logo.jpg"
+            alt="Aklan State University Logo"
+            class="logo"
+        >
+
+        <h1 class="title">EduPath</h1>
+
+        <p class="subtitle">
+            Course Recommendation System
+        </p>
+
+        <p class="description">
+            Discover the best courses suited for your interests and
+            skills. Plan your future career path with us.
+        </p>
+
+        <div class="buttons">
+
+            <a href="{% url 'signin' %}" class="btn btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Login
+            </a>
+
+            <a href="{% url 'signup' %}" class="btn btn-register">
+                <i class="fa-solid fa-user-plus"></i>
+                <u>Register</u>
+            </a>
+
         </div>
 
-        <!-- Right Column (Form) -->
-        <div class="right-column">
-            <div class="form-card">
-                <h2>Sign Up</h2>
-                <p class="sub-header">or <a href="{% url 'signin' %}">Sign In</a></p>
-                <form action="{% url 'index' %}" method="POST">
-                    {% csrf_token %}
+    </main>
 
-                    {% if errors %}
-                    <div class="error-card">
-                        <i class="fas fa-exclamation-circle error-card-icon"></i>
-                        <div class="error-card-body">
-                            <div class="error-card-title">Please correct the following issue{{ errors|length|pluralize }}:</div>
-                            <ul class="error-card-list">
-                                {% for error in errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% endif %}
+    <footer class="footer">
+        © 2026 EduPath System. All rights reserved.
+    </footer>
 
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-user input-icon"></i>
-                            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value="{{ form_data.fullName|default:'' }}" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-id-card input-icon"></i>
-                            <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" value="{{ form_data.studentId|default:'' }}" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <div class="input-wrapper">
-                                <i class="fas fa-calendar-alt input-icon"></i>
-                                <input type="number" id="age" name="age" placeholder="Age" value="{{ form_data.age|default:'' }}" required min="1" max="120">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-wrapper">
-                                <i class="fas fa-venus-mars input-icon"></i>
-                                <select id="sex" name="sex" required>
-                                    <option value="" disabled {% if not form_data.sex %}selected{% endif %}>Select sex</option>
-                                    <option value="Male" {% if form_data.sex == 'Male' %}selected{% endif %}>Male</option>
-                                    <option value="Female" {% if form_data.sex == 'Female' %}selected{% endif %}>Female</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-envelope input-icon"></i>
-                            <input type="email" id="email" name="email" placeholder="Enter your email address (optional)" value="{{ form_data.email|default:'' }}">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="password" name="password" placeholder="Enter a password" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group terms">
-                        <input type="checkbox" id="terms" name="terms" required>
-                        <label for="terms">
-                            I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
-                        </label>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Sign Up</button>
-                </form>
-
-                <p class="footer-link">Already have an account? <a href="{% url 'signin' %}">Sign In</a></p>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EduPath{% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-icon.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/asu-logo.jpg' %}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <!-- Common Base CSS -->
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
     <!-- Assessment Base CSS -->
     <link rel="stylesheet" href="{% static 'css/assessment.css' %}">
     {% block css %}{% endblock %}
@@ -20,8 +20,9 @@
     <!-- Header -->
     <header class="header">
         <a href="{% url 'dashboard' %}" class="brand" style="text-decoration: none;">
-            <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo">
-            <span class="brand-name">Edu<span class="text-bold">Path</span></span>
+            <img src="{% static 'img/asu-logo.jpg' %}" alt="EduPath Logo" class="logo">
+            <span class="brand-name">Edu<span class="text-bold" style="color: #35a84a;">Path</span></span>
+            <span style="color: #555; font-size: 15px; margin-left: 10px; font-weight: 500;">Course Recommendation System</span>
         </a>
 
         <div class="header-actions">

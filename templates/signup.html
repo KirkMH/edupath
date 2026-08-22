@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/asu-logo.jpg' %}">
+
+    <title>EduPath - Register</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- Auth CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body class="auth-body">
+
+    <main class="landing-card">
+
+        <img
+            src="{% static 'img/asu-logo.jpg' %}"
+            alt="Aklan State University Logo"
+            class="logo"
+        >
+
+        <h1 class="title">EduPath</h1>
+
+        <p class="subtitle">
+            Create your account
+        </p>
+
+        {% if errors %}
+        <div class="error-card">
+            <i class="fas fa-exclamation-circle error-card-icon"></i>
+            <div class="error-card-body">
+                <div class="error-card-title">Please correct the following issue{{ errors|length|pluralize }}:</div>
+                <ul class="error-card-list">
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <form action="{% url 'signup' %}" method="POST" class="signup-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value="{{ form_data.fullName|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" id="studentId" name="studentId" placeholder="Learner's Reference Number (LRN)" value="{{ form_data.studentId|default:'' }}" pattern="\d{12}" maxlength="12" minlength="12" inputmode="numeric" title="Please enter a 12-digit LRN" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <input type="number" id="age" name="age" placeholder="Age" value="{{ form_data.age|default:'' }}" required min="1" max="120">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-venus-mars input-icon"></i>
+                        <select id="sex" name="sex" required>
+                            <option value="" disabled {% if not form_data.sex %}selected{% endif %}>Select sex</option>
+                            <option value="Male" {% if form_data.sex == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if form_data.sex == 'Female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" name="email" placeholder="Email address (optional)" value="{{ form_data.email|default:'' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-shield-halved input-icon"></i>
+                    <select id="securityQuestion" name="securityQuestion" required>
+                        <option value="" disabled {% if not form_data.securityQuestion %}selected{% endif %}>Select a security question</option>
+                        <option value="What was the name of your first pet?" {% if form_data.securityQuestion == 'What was the name of your first pet?' %}selected{% endif %}>What was the name of your first pet?</option>
+                        <option value="What is your mother's maiden name?" {% if form_data.securityQuestion == "What is your mother's maiden name?" %}selected{% endif %}>What is your mother's maiden name?</option>
+                        <option value="What was the name of your elementary school?" {% if form_data.securityQuestion == 'What was the name of your elementary school?' %}selected{% endif %}>What was the name of your elementary school?</option>
+                        <option value="What city were you born in?" {% if form_data.securityQuestion == 'What city were you born in?' %}selected{% endif %}>What city were you born in?</option>
+                        <option value="What is your favorite childhood food?" {% if form_data.securityQuestion == 'What is your favorite childhood food?' %}selected{% endif %}>What is your favorite childhood food?</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="text" id="securityAnswer" name="securityAnswer" placeholder="Your answer to the security question" value="{{ form_data.securityAnswer|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="terms-row">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                    I agree to the <a href="javascript:void(0)" onclick="openModal('termsModal')">Terms & Conditions</a> and <a href="javascript:void(0)" onclick="openModal('privacyModal')">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-user-plus"></i>
+                Register
+            </button>
+        </form>
+
+        <p class="card-footer-link">
+            Already have an account? <a href="{% url 'signin' %}">Login Here</a>
+        </p>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 EduPath System. All rights reserved.
+    </footer>
+
+    <!-- Terms & Conditions Modal -->
+    <div id="termsModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-contract"></i> Terms & Conditions</h3>
+                <button type="button" class="modal-close-btn" onclick="closeModal('termsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>1. Acceptance of Terms</h4>
+                <p>By creating an account on EduPath, you agree to abide by these terms and conditions. If you do not agree, please do not use the system.</p>
+
+                <h4>2. Student Account Security</h4>
+                <p>You are responsible for maintaining the confidentiality of your account details, including your Student ID, LRN, password, and security answers.</p>
+
+                <h4>3. Academic Advisory Purpose</h4>
+                <p>EduPath provides personalized course recommendations based on aptitude and interest assessments. Recommendations are advisory tools meant to support academic planning at Aklan State University.</p>
+
+                <h4>4. Acceptable Conduct</h4>
+                <p>Users agree to provide accurate demographic and assessment information. Impersonating other students or interfering with system operations is strictly prohibited.</p>
+
+                <h4>5. System Modifications</h4>
+                <p>EduPath reserves the right to update features, assessments, and policy terms to improve the quality of academic advising services.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-action" onclick="closeModal('termsModal')">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-shield"></i> Privacy Policy</h3>
+                <button type="button" class="modal-close-btn" onclick="closeModal('privacyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>1. Information We Collect</h4>
+                <p>We collect essential student demographic details (Name, Student ID/LRN, Age, Sex, Email) and assessment responses submitted during aptitude tests.</p>
+
+                <h4>2. How We Use Your Data</h4>
+                <p>Your data is strictly used to process assessment results, calculate course suitability scores, and deliver personalized academic recommendations.</p>
+
+                <h4>3. Data Confidentiality & Protection</h4>
+                <p>We implement security protocols to protect student records. We do not sell, trade, or share student data with unauthorized third parties.</p>
+
+                <h4>4. Access & Control</h4>
+                <p>Authorized academic advisors and system administrators at Aklan State University may review aggregated results for institutional guidance and research.</p>
+
+                <h4>5. Contact Us</h4>
+                <p>If you have questions regarding your data privacy, please reach out to the EduPath Administration or Guidance Office.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-action" onclick="closeModal('privacyModal')">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close modal when clicking backdrop
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-backdrop')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
+</body>
+</html>

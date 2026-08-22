@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,17 @@ from .models import StudentProfile, StudentAptitudeResponse
 
 def index(request):
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
+        return redirect('dashboard')
+
+    return render(request, 'index.html')
+
+
+def signup(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
         return redirect('dashboard')
 
     if request.method == 'POST':
@@ -20,6 +32,8 @@ def index(request):
         email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirmPassword', '')
+        security_question = request.POST.get('securityQuestion', '').strip()
+        security_answer = request.POST.get('securityAnswer', '').strip()
         terms = request.POST.get('terms')
 
         errors = []
@@ -28,13 +42,19 @@ def index(request):
         if not full_name:
             errors.append("Full Name is required.")
         if not student_id:
-            errors.append("Student ID is required.")
+            errors.append("Student ID / LRN is required.")
+        elif not student_id.isdigit() or len(student_id) != 12:
+            errors.append("Student ID / LRN must be exactly a 12-digit number.")
         if not age_raw:
             errors.append("Age is required.")
         if not sex:
             errors.append("Sex is required.")
         if not password:
             errors.append("Password is required.")
+        if not security_question:
+            errors.append("Security question is required.")
+        if not security_answer:
+            errors.append("Security answer is required.")
 
         # 2. Checkbox validation
         if not terms:
@@ -57,7 +77,7 @@ def index(request):
             errors.append("A student profile with this Full Name and Student ID pair already exists.")
 
         if errors:
-            return render(request, 'index.html', {
+            return render(request, 'signup.html', {
                 'errors': errors,
                 'form_data': {
                     'fullName': full_name,
@@ -65,6 +85,8 @@ def index(request):
                     'age': age_raw,
                     'sex': sex,
                     'email': email,
+                    'securityQuestion': security_question,
+                    'securityAnswer': security_answer,
                 }
             })
 
@@ -87,7 +109,9 @@ def index(request):
                 student_id=student_id,
                 full_name=full_name,
                 age=age,
-                sex=sex
+                sex=sex,
+                security_question=security_question,
+                security_answer=security_answer
             )
 
             # Log in the user and redirect to dashboard
@@ -95,7 +119,7 @@ def index(request):
             return redirect('dashboard')
         except IntegrityError:
             errors.append("An error occurred while creating your account. Please verify your information and try again.")
-            return render(request, 'index.html', {
+            return render(request, 'signup.html', {
                 'errors': errors,
                 'form_data': {
                     'fullName': full_name,
@@ -103,28 +127,32 @@ def index(request):
                     'age': age_raw,
                     'sex': sex,
                     'email': email,
+                    'securityQuestion': security_question,
+                    'securityAnswer': security_answer,
                 }
             })
 
-    return render(request, 'index.html')
+    return render(request, 'signup.html')
 
 
 def signin(request):
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
         return redirect('dashboard')
 
     if request.method == 'POST':
-        login_id = request.POST.get('login_id', request.POST.get('email', '')).strip()
+        login_id = request.POST.get('login_id', request.POST.get('username', request.POST.get('email', ''))).strip()
         password = request.POST.get('password', '')
         remember_me = request.POST.get('rememberMe')
 
         if not login_id or not password:
             return render(request, 'signin.html', {
-                'error': 'Please provide your Student ID or Email and password.',
+                'error': 'Please provide your Username, Student ID, or Email and password.',
                 'login_id': login_id
             })
 
-        # Find user by student_id (username) or email
+        # Find user by username (student_id / admin username) or email
         user_obj = None
         if User.objects.filter(username__iexact=login_id).exists():
             user_obj = User.objects.get(username__iexact=login_id)
@@ -140,11 +168,18 @@ def signin(request):
                 request.session.set_expiry(1209600)  # 2 weeks
             else:
                 request.session.set_expiry(0)  # Expire on browser close
-            next_url = request.GET.get('next', 'dashboard')
-            return redirect(next_url)
+
+            if user.is_staff or user.is_superuser:
+                next_url = request.GET.get('next') or request.POST.get('next') or '/admin/'
+                return redirect(next_url)
+            else:
+                next_url = request.GET.get('next') or request.POST.get('next') or 'dashboard'
+                if next_url.startswith('/admin'):
+                    next_url = 'dashboard'
+                return redirect(next_url)
         else:
             return render(request, 'signin.html', {
-                'error': 'Invalid Student ID/Email address or password.',
+                'error': 'Invalid Username/Student ID/Email address or password.',
                 'login_id': login_id
             })
 
@@ -228,4 +263,4 @@ def assess_preference(request):
 def result(request):
     return render(request, 'assessment/result.html')
 
-
+

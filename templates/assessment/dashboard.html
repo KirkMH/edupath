@@ -3,6 +3,10 @@
 
 {% block title %}EduPath | Student Dashboard{% endblock %}
 
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
         <section class="hero">
             <div class="hero-content">
@@ -15,58 +19,15 @@
                     Let's take the next step toward your future.
                 </p>
 
-                <div class="today-card">
-                    <div class="today-icon">
-                        <img src="{% static 'img/edupath-icon.png' %}" alt="EduPath">
-                    </div>
-
-                    <div class="today-text">
-                        EduPath helps you discover the right academic
-                        track and career path through smart assessments
-                        and personalized insights.
-                    </div>
+                <div class="today-text"     >
+                    EduPath helps you discover the right academic
+                    track and career path through smart assessments
+                    and personalized insights.
                 </div>
             </div>
 
             <div class="hero-illustration">
-                <img src="{% static 'img/grads.jpg' %}" alt="EduPath">
-            </div>
-        </section>
-
-        <section class="features-section">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-brain"></i>
-                    </div>
-                    <h3>Smart Assessment</h3>
-                    <p>
-                        Answer thoughtfully designed questions
-                        that evaluate your skills and interests.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <h3>Personalized Insights</h3>
-                    <p>
-                        Get clear results and recommendations
-                        tailored for you.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-compass"></i>
-                    </div>
-                    <h3>Confident Choices</h3>
-                    <p>
-                        Make informed decisions about your future
-                        with confidence.
-                    </p>
-                </div>
+                <img src="{% static 'img/asu-kalibo.jpg' %}" alt="EduPath">
             </div>
         </section>
 
@@ -79,68 +40,36 @@
             <div class="steps">
                 <div class="step">
                     <div class="step-icon">
-                        <i class="fa-solid fa-user-check"></i>
+                        <i class="fa-solid fa-brain"></i>
                     </div>
                     <div class="step-number">1</div>
-                    <h3>Account Ready</h3>
+                    <h3>Aptitude Assessment</h3>
                     <p>
-                        You're signed in and ready to begin
-                        your assessment.
+                        48 multiple choice items
                     </p>
                 </div>
 
                 <div class="step">
                     <div class="step-icon">
-                        <i class="fa-solid fa-file-pen"></i>
+                        <i class="fa-solid fa-sliders"></i>
                     </div>
                     <div class="step-number">2</div>
-                    <h3>Take Assessment</h3>
+                    <h3>Preference Assessment</h3>
                     <p>
-                        Answer the questions honestly.
-                        It usually takes 15–25 minutes.
+                        60 Likert-scale items
                     </p>
                 </div>
 
                 <div class="step">
                     <div class="step-icon">
-                        <i class="fa-solid fa-chart-pie"></i>
+                        <i class="fa-solid fa-trophy"></i>
                     </div>
                     <div class="step-number">3</div>
-                    <h3>Review Results</h3>
+                    <h3>Results</h3>
                     <p>
-                        See your results and understand
-                        your strengths, interests, and traits.
+                        Top 3 recommendation
                     </p>
                 </div>
-
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fa-solid fa-route"></i>
-                    </div>
-                    <div class="step-number">4</div>
-                    <h3>Explore Paths</h3>
-                    <p>
-                        Discover recommended academic tracks
-                        and career options.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section class="cta">
-            <div class="rocket">
-                <img src="{% static 'img/rocket.png' %}" alt="EduPath">
-            </div>
-
-            <div class="cta-content">
-                <h2>
-                    Ready to discover<br>
-                    your path?
-                </h2>
-                <p>
-                    Start the assessment now and take the first
-                    step toward your future.
-                </p>
             </div>
 
             <button class="start-button" onclick="window.location.href='{% url 'aptitude_ready' %}'">

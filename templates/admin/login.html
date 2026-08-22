@@ -17,11 +17,11 @@
 <body>
     <div class="page-container">
         <!-- Left Column (Hero Info) -->
-        <div class="left-column" style="background-color: #d95d39;">
+        <div class="left-column" style="background: linear-gradient(135deg, #35a84a 0%, #15803d 100%);">
             <div class="logo-container">
                 <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo" style="height: 250px;">
             </div>
-            <h2 style="color: rgba(30, 41, 59, 1);">
+            <h2 style="color: #ffffff;">
                 EduPath Administrator Portal
             </h2>
         </div>
@@ -29,7 +29,7 @@
         <!-- Right Column (Form) -->
         <div class="right-column">
             <div class="form-card">
-                <h2 style="margin-bottom: 1.5rem; text-align: center;">Administrator's Login</h2>
+                <h2 style="margin-bottom: 1.5rem; text-align: center; color: #1b4324;">Administrator's Login</h2>
                 
                 <form action="{{ app_path }}" method="post">
                     {% csrf_token %}
@@ -62,7 +62,7 @@
 
                     <input type="hidden" name="next" value="{{ next }}">
 
-                    <button type="submit" class="submit-btn" style="margin-bottom: 0;">Log In</button>
+                    <button type="submit" class="submit-btn" style="background-color: #35a84a; border: none; margin-bottom: 0;">Log In</button>
                 </form>
             </div>
         </div>

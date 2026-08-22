@@ -1,77 +1,85 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPath - Smart Assessment. Confident Career Choices.</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'img/edupath-icon.png' %}">
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google Fonts - Inter for clean typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/asu-logo.jpg' %}">
+
+    <title>EduPath - Login</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- Auth CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-<body>
-    <div class="page-container">
-        <!-- Left Column (Hero Info) -->
-        <div class="left-column">
-            <div class="logo-container">
-                <img src="{% static 'img/edupath-logo.png' %}" alt="EduPath Logo">
-            </div>
-            <p class="description">
-                Welcome to EduPath. Your future, clearly defined. We provide smart, personalized assessments and career pathing tools to help you navigate your academic journey with confidence.
-            </p>
+
+<body class="auth-body">
+
+    <main class="landing-card">
+
+        <img
+            src="{% static 'img/asu-logo.jpg' %}"
+            alt="Aklan State University Logo"
+            class="logo"
+        >
+
+        <h1 class="title">EduPath</h1>
+
+        <p class="subtitle">
+            Sign in to your account
+        </p>
+
+        {% if error %}
+        <div class="error-card">
+            <i class="fas fa-exclamation-circle error-card-icon"></i>
+            <span class="error-card-text">{{ error }}</span>
         </div>
+        {% endif %}
 
-        <!-- Right Column (Form) -->
-        <div class="right-column">
-            <div class="form-card">
-                <h2>Sign In</h2>
-                <p class="sub-header">or <a href="{% url 'index' %}">Sign Up</a></p>
-                <form action="{% url 'signin' %}" method="POST">
-                    {% csrf_token %}
+        <form action="{% url 'signin' %}" method="POST" class="login-form">
+            {% csrf_token %}
 
-                    {% if error %}
-                    <div class="error-card">
-                        <i class="fas fa-exclamation-circle error-card-icon"></i>
-                        <div class="error-card-body">
-                            <div class="error-card-title">Sign In Error</div>
-                            <p style="font-size: 0.825rem; color: #7f1d1d; margin: 0; line-height: 1.4;">{{ error }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-user input-icon"></i>
-                            <input type="text" id="login_id" name="login_id" placeholder="Enter your Student ID or Email address" value="{{ login_id|default:'' }}" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
-                        <div class="password-row">
-                            <label style="display: flex; align-items: center; font-size: 0.8rem; color: #6b7280; font-weight: 400; margin-bottom: 0; cursor: pointer;">
-                                <input type="checkbox" id="rememberMe" name="rememberMe" style="margin-right: 0.5rem; width: auto; cursor: pointer;"> Remember me
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Sign In</button>
-                </form>
-
-                <p class="footer-link">Don't have an account? <a href="{% url 'index' %}">Sign Up</a></p>
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="login_id" name="login_id" placeholder="Enter your LRN, Username, or Email" value="{{ login_id|default:'' }}" required>
+                </div>
             </div>
-        </div>
-    </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+            </div>
+
+            <div class="remember-row">
+                <label class="remember-label">
+                    <input type="checkbox" id="rememberMe" name="rememberMe"> Remember me
+                </label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Sign In
+            </button>
+        </form>
+
+        <p class="card-footer-link">
+            Don't have an account? <a href="{% url 'signup' %}">Register</a>
+        </p>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 EduPath System. All rights reserved.
+    </footer>
+
 </body>
 </html>

@@ -49,11 +49,11 @@
 .category-tag {
     font-size: 12px;
     font-weight: 700;
-    color: #0284c7;
-    background: #f0f9ff;
+    color: #fff;
+    background: #15803d;
     padding: 4px 12px;
     border-radius: 20px;
-    border: 1px solid #e0f2fe;
+    border: 1px solid #dcfce7;
 }
 
 .question-stem {
@@ -115,24 +115,24 @@
 }
 
 .choice-card:hover {
-    border-color: #38bdf8;
-    background: #f0f9ff;
+    border-color: #4caf50;
+    background: #f4faf5;
     transform: translateY(-1px);
 }
 
 .choice-card:hover .choice-letter {
-    background: #bae6fd;
-    color: #0284c7;
+    background: #e8f5e9;
+    color: #35a84a;
 }
 
 .choice-card:has(input[type="radio"]:checked) {
-    border-color: #0284c7;
-    background: #f0f9ff;
-    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+    border-color: #35a84a;
+    background: #edf7ee;
+    box-shadow: 0 4px 14px rgba(53, 168, 74, 0.18);
 }
 
 .choice-card:has(input[type="radio"]:checked) .choice-letter {
-    background: #0284c7;
+    background: #35a84a;
     color: #ffffff;
 }
 
