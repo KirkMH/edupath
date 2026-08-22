@@ -142,3 +142,81 @@ class ScoreInterpretation(models.Model):
 
     class Meta:
         verbose_name_plural = "Score Interpretations"
+
+
+from django.conf import settings
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+
+
+class ActivityLog(models.Model):
+    """
+    Audit log for recording system activities (logins, logouts, failed attempts, assessment completions).
+    Only visible in the admin panel as read-only.
+    """
+    ACTION_CHOICES = [
+        ('LOGIN', 'User Logged In'),
+        ('LOGOUT', 'User Logged Out'),
+        ('FAILED_LOGIN', 'Failed Login Attempt'),
+        ('FAILED_PASSWORD_RESET', 'Failed Password Reset'),
+        ('ASSESSMENT_COMPLETED', 'Assessment Completed'),
+    ]
+
+    log_id = models.AutoField(primary_key=True, verbose_name="Log ID")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='activity_logs',
+        verbose_name="User"
+    )
+    action = models.CharField(max_length=64, choices=ACTION_CHOICES, verbose_name="Action")
+    details = models.TextField(blank=True, null=True, verbose_name="Details")
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Timestamp")
+
+    def __str__(self):
+        user_str = self.user.username if self.user else "System/Unknown"
+        return f"[{self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] {user_str} - {self.get_action_display()}"
+
+    class Meta:
+        verbose_name = "Activity Log"
+        verbose_name_plural = "Activity Logs"
+        ordering = ['-timestamp']
+
+
+@receiver(user_logged_in)
+def log_user_login(sender, request, user, **kwargs):
+    if user:
+        ActivityLog.objects.create(
+            user=user,
+            action='LOGIN',
+            details=f"User '{user.username}' logged into the system."
+        )
+
+
+@receiver(user_logged_out)
+def log_user_logout(sender, request, user, **kwargs):
+    if user and hasattr(user, 'username'):
+        ActivityLog.objects.create(
+            user=user,
+            action='LOGOUT',
+            details=f"User '{user.username}' logged out of the system."
+        )
+
+
+@receiver(user_login_failed)
+def log_user_login_failed(sender, credentials, request, **kwargs):
+    login_id = credentials.get('username') or credentials.get('email') or 'Unknown'
+    user_obj = None
+    if User.objects.filter(username__iexact=login_id).exists():
+        user_obj = User.objects.get(username__iexact=login_id)
+    elif User.objects.filter(email__iexact=login_id).exclude(email='').exists():
+        user_obj = User.objects.filter(email__iexact=login_id).exclude(email='').first()
+
+    ActivityLog.objects.create(
+        user=user_obj,
+        action='FAILED_LOGIN',
+        details=f"Failed login attempt using Username/Email/LRN identifier: '{login_id}'"
+    )

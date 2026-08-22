@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
-from customization.models import AptitudeQuestion
+from customization.models import AptitudeQuestion, ActivityLog
 from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse
 from .services import sync_interest_questions
 
@@ -236,8 +236,18 @@ def forgot_password(request):
                         step = 2
                     else:
                         error = "The security question or answer does not match our records."
+                        ActivityLog.objects.create(
+                            user=profile.user,
+                            action='FAILED_PASSWORD_RESET',
+                            details=f"Failed password reset verification for LRN '{student_id}' (security answer or question mismatch)."
+                        )
                 except StudentProfile.DoesNotExist:
                     error = "No student account found with the provided LRN."
+                    ActivityLog.objects.create(
+                        user=None,
+                        action='FAILED_PASSWORD_RESET',
+                        details=f"Failed password reset attempt for non-existent LRN: '{student_id}'."
+                    )
 
         elif action_step == '2':
             reset_student_id = request.session.get('reset_student_id')
@@ -331,6 +341,11 @@ def assess_aptitude(request):
                 )
         student_profile.last_date_taken = timezone.now()
         student_profile.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            action='ASSESSMENT_COMPLETED',
+            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) completed the Aptitude Assessment."
+        )
         return redirect('preference_ready')
 
     existing_responses = StudentAptitudeResponse.objects.filter(student=student_profile)
@@ -365,6 +380,11 @@ def assess_preference(request):
                     )
         student_profile.last_date_taken = timezone.now()
         student_profile.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            action='ASSESSMENT_COMPLETED',
+            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) completed the Interest Preference Assessment."
+        )
         return redirect('loading')
 
     existing_responses = StudentInterestResponse.objects.filter(student=student_profile)
