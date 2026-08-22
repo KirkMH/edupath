@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
-from customization.models import AptitudeQuestion, ActivityLog
+from customization.models import AptitudeQuestion, ActivityLog, check_and_lock_account
 from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse
 from .services import sync_interest_questions
 
@@ -165,6 +165,14 @@ def signin(request):
         elif User.objects.filter(email__iexact=login_id).exclude(email='').exists():
             user_obj = User.objects.filter(email__iexact=login_id).exclude(email='').first()
 
+        if user_obj and not user_obj.is_active:
+            return render(request, 'signin.html', {
+                'error': 'Your account has been locked due to multiple failed attempts. Please contact the administrator.',
+                'is_locked': True,
+                'login_id': login_id,
+                'success': success,
+            })
+
         username_to_auth = user_obj.username if user_obj else login_id
 
         user = authenticate(request, username=username_to_auth, password=password)
@@ -184,8 +192,20 @@ def signin(request):
                     next_url = 'dashboard'
                 return redirect(next_url)
         else:
+            is_locked = False
+            if user_obj:
+                user_obj.refresh_from_db()
+                if not user_obj.is_active:
+                    error_msg = 'Your account has been locked due to 5 failed login attempts. Please contact the administrator.'
+                    is_locked = True
+                else:
+                    error_msg = 'Invalid Username/Student ID/Email address or password.'
+            else:
+                error_msg = 'Invalid Username/Student ID/Email address or password.'
+
             return render(request, 'signin.html', {
-                'error': 'Invalid Username/Student ID/Email address or password.',
+                'error': error_msg,
+                'is_locked': is_locked,
                 'login_id': login_id,
                 'success': success,
             })
@@ -200,6 +220,7 @@ def forgot_password(request):
         return redirect('dashboard')
 
     error = None
+    is_locked = False
     step = 1
     form_data = {}
 
@@ -228,19 +249,27 @@ def forgot_password(request):
             else:
                 try:
                     profile = StudentProfile.objects.get(student_id__iexact=student_id)
-                    if (profile.security_question == security_question and
+                    if profile.user and not profile.user.is_active:
+                        error = "Your account has been locked due to multiple failed attempts. Please contact the administrator."
+                        is_locked = True
+                    elif (profile.security_question == security_question and
                         profile.security_answer and
                         profile.security_answer.strip().lower() == security_answer.strip().lower()):
                         # Verification successful! Advance to Step 2.
                         request.session['reset_student_id'] = profile.student_id
                         step = 2
                     else:
-                        error = "The security question or answer does not match our records."
                         ActivityLog.objects.create(
                             user=profile.user,
                             action='FAILED_PASSWORD_RESET',
                             details=f"Failed password reset verification for LRN '{student_id}' (security answer or question mismatch)."
                         )
+                        locked = check_and_lock_account(profile.user, 'FAILED_PASSWORD_RESET')
+                        if locked or (profile.user and not profile.user.is_active):
+                            error = "Your account has been locked due to 5 failed security question attempts. Please contact the administrator."
+                            is_locked = True
+                        else:
+                            error = "The security question or answer does not match our records."
                 except StudentProfile.DoesNotExist:
                     error = "No student account found with the provided LRN."
                     ActivityLog.objects.create(
@@ -284,6 +313,7 @@ def forgot_password(request):
 
     return render(request, 'forgot_password.html', {
         'error': error,
+        'is_locked': is_locked,
         'step': step,
         'form_data': form_data,
         'student_id': request.session.get('reset_student_id', '') if step == 2 else ''

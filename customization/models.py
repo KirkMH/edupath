@@ -152,7 +152,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 
 class ActivityLog(models.Model):
     """
-    Audit log for recording system activities (logins, logouts, failed attempts, assessment completions).
+    Audit log for recording system activities (logins, logouts, failed attempts, account locking, assessment completions).
     Only visible in the admin panel as read-only.
     """
     ACTION_CHOICES = [
@@ -160,6 +160,7 @@ class ActivityLog(models.Model):
         ('LOGOUT', 'User Logged Out'),
         ('FAILED_LOGIN', 'Failed Login Attempt'),
         ('FAILED_PASSWORD_RESET', 'Failed Password Reset'),
+        ('ACCOUNT_LOCKED', 'Account Locked'),
         ('ASSESSMENT_COMPLETED', 'Assessment Completed'),
     ]
 
@@ -184,6 +185,43 @@ class ActivityLog(models.Model):
         verbose_name = "Activity Log"
         verbose_name_plural = "Activity Logs"
         ordering = ['-timestamp']
+
+
+def check_and_lock_account(user, failed_action_type=None):
+    """
+    Checks recent ActivityLogs for `user`. If 5 consecutive failed attempts
+    (FAILED_LOGIN or FAILED_PASSWORD_RESET) occurred without an intervening LOGIN,
+    locks the user account (is_active = False) and records an ACCOUNT_LOCKED ActivityLog entry.
+    """
+    if not user or not user.is_active:
+        return False
+
+    recent_logs = ActivityLog.objects.filter(user=user).order_by('-timestamp')[:10]
+
+    failed_count = 0
+    for log in recent_logs:
+        if log.action in ('FAILED_LOGIN', 'FAILED_PASSWORD_RESET'):
+            failed_count += 1
+        elif log.action in ('LOGIN', 'ACCOUNT_LOCKED'):
+            break
+
+    if failed_count >= 5:
+        user.is_active = False
+        user.save()
+
+        reason = (
+            "failed login attempts" if failed_action_type == 'FAILED_LOGIN'
+            else "failed password reset attempts" if failed_action_type == 'FAILED_PASSWORD_RESET'
+            else "failed authentication attempts"
+        )
+
+        ActivityLog.objects.create(
+            user=user,
+            action='ACCOUNT_LOCKED',
+            details=f"Account for user '{user.username}' was automatically locked due to 5 consecutive {reason}."
+        )
+        return True
+    return False
 
 
 @receiver(user_logged_in)
@@ -219,4 +257,8 @@ def log_user_login_failed(sender, credentials, request, **kwargs):
         user=user_obj,
         action='FAILED_LOGIN',
         details=f"Failed login attempt using Username/Email/LRN identifier: '{login_id}'"
-    )
+    )
+
+    if user_obj:
+        check_and_lock_account(user_obj, 'FAILED_LOGIN')
+
