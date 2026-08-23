@@ -379,9 +379,23 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    max-width: 500px;
+    overflow-x: auto;
+    padding: 6px 4px;
+    scrollbar-width: thin;
+}
+
+.page-numbers::-webkit-scrollbar {
+    height: 4px;
+}
+
+.page-numbers::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
 }
 
 .page-link {
+    flex-shrink: 0;
     width: 36px;
     height: 36px;
     display: flex;
@@ -406,6 +420,7 @@
     color: #ffffff;
     font-weight: 700;
 }
+
 
 .btn-nav-next {
     display: inline-flex;

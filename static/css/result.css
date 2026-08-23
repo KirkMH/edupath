@@ -227,23 +227,28 @@
 }
 
 .badge-riasec {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 10px;
+    color: #ffffff;
+    font-size: 11px;
     font-weight: 800;
+    letter-spacing: 0.2px;
+    flex-shrink: 0;
 }
 
-.badge-s { background-color: #35a84a; }
-.badge-i { background-color: #16a34a; }
-.badge-a { background-color: #059669; }
-.badge-r { background-color: #f59e0b; }
-.badge-e { background-color: #f97316; }
-.badge-c { background-color: #8b5cf6; }
+/* Clean Flat Holland RIASEC Badge Colors */
+.badge-r { background-color: #ef4444; } /* Realistic: Red */
+.badge-i { background-color: #3b82f6; } /* Investigative: Blue */
+.badge-a { background-color: #a855f7; } /* Artistic: Purple */
+.badge-s { background-color: #10b981; } /* Social: Emerald Green */
+.badge-e { background-color: #f97316; } /* Enterprising: Orange */
+.badge-c { background-color: #06b6d4; } /* Conventional: Cyan/Teal */
+
+
 
 .riasec-title {
     font-weight: 600;

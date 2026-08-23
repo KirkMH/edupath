@@ -1,0 +1,176 @@
+:root {
+    --primary: #35a84a;
+    --primary-dark: #2f963f;
+    --secondary: #15803d;
+    --navy: #1b4324;
+    --accent: #4caf50;
+    
+    /* Header Colors */
+    --header-bg: #1b4324;
+    --header-color: #ffffff;
+    --header-link-color: #dcfce7;
+
+    /* Buttons */
+    --button-bg: #35a84a;
+    --button-hover-bg: #2f963f;
+    --default-button-bg: #35a84a;
+    --default-button-hover-bg: #2f963f;
+
+    /* Links - Preserve original dark charcoal/black for model names */
+    --link-fg: #262626;
+    --link-hover-color: #35a84a;
+    --link-selected-fg: #35a84a;
+
+    /* Breadcrumbs & Accents */
+    --breadcrumbs-bg: #e8f5e9;
+    --breadcrumbs-fg: #1b4324;
+    --breadcrumbs-link-fg: #35a84a;
+    
+    /* Active & Hover states */
+    --hairline-color: #e1f5e3;
+    --border-color: #e1f5e3;
+}
+
+/* Header Navbar */
+#header {
+    background: #1b4324 !important;
+    color: #ffffff !important;
+    border-bottom: 3px solid #35a84a !important;
+}
+
+#header a:link, #header a:visited {
+    color: #ffffff !important;
+}
+
+#header a:hover {
+    color: #86efac !important;
+}
+
+/* User tools (Log out, Change password, Welcome) */
+#user-tools a {
+    border-bottom: 1px solid #4caf50 !important;
+}
+
+#user-tools a:hover {
+    color: #86efac !important;
+}
+
+/* Module Headers & Captions */
+.module h2, .module caption, .inline-group h2,
+.module h2 a, .module caption a, .inline-group h2 a,
+.module h2 a:link, .module h2 a:visited,
+.module caption a:link, .module caption a:visited,
+a.section, a.section:link, a.section:visited {
+    background: #35a84a !important;
+    color: #ffffff !important;
+}
+
+.module h2 a:hover, .module caption a:hover, a.section:hover {
+    color: #dcfce7 !important;
+}
+
+div.breadcrumbs {
+    background: #e8f5e9 !important;
+    color: #1b4324 !important;
+    border-bottom: 1px solid #b7ebbe !important;
+}
+
+div.breadcrumbs a {
+    color: #35a84a !important;
+    font-weight: 600;
+}
+
+div.breadcrumbs a:hover {
+    color: #15803d !important;
+}
+
+/* Buttons */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #35a84a !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: #2f963f !important;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #15803d !important;
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+    background: #14532d !important;
+}
+
+/* Links - Keep original black/dark charcoal (#262626) for model names & section items */
+#content-main .module table th a:link,
+#content-main .module table th a:visited,
+#content-main .module table td a:link,
+#content-main .module table td a:visited,
+#nav-sidebar th[scope=row] a:link,
+#nav-sidebar th[scope=row] a:visited,
+#nav-sidebar td a:link,
+#nav-sidebar td a:visited,
+.model-name a,
+a:link, a:visited {
+    color: #262626 !important;
+}
+
+#content-main .module table th a:hover,
+#content-main .module table td a:hover,
+#nav-sidebar th[scope=row] a:hover,
+#nav-sidebar td a:hover,
+a:hover {
+    color: #35a84a !important;
+}
+
+/* App Section Headings in Sidebar */
+#nav-sidebar .current-app .section:link, 
+#nav-sidebar .current-app .section:visited {
+    color: #1b4324 !important;
+    font-weight: bold !important;
+}
+
+/* Tables & Change List */
+#changelist table thead th {
+    background: #f0faf1 !important;
+}
+
+#changelist table thead th a {
+    color: #1b4324 !important;
+    font-weight: 700 !important;
+}
+
+#changelist table tbody tr:hover {
+    background-color: #f4fbf5 !important;
+}
+
+.selector-chosen h2 {
+    background: #35a84a !important;
+}
+
+.paginator a:link, .paginator a:visited {
+    background: #35a84a !important;
+    color: #ffffff !important;
+    border-radius: 4px;
+}
+
+/* Object Tools (Add button, etc) */
+.object-tools a:link, .object-tools a:visited {
+    background: #35a84a !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}
+
+.object-tools a:hover {
+    background: #2f963f !important;
+}
+
+#nav-sidebar tr.current-model {
+    background: #edf7ee !important;
+}

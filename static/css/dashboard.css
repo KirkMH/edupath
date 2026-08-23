@@ -282,6 +282,81 @@
     transform: translateY(-2px);
 }
 
+.button-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.button-group .start-button {
+    margin-top: 0;
+    flex: 1;
+}
+
+.button-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 48px;
+    background: transparent;
+    color: #2a5a35;
+    border: 2px solid #35a84a;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.button-secondary:hover {
+    background: #e8f5e9;
+    color: #1b5e20;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(53, 168, 74, 0.15);
+}
+
+.completed-banner {
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 12px;
+    padding: 16px 22px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(53, 168, 74, 0.06);
+}
+
+.completed-banner i {
+    font-size: 26px;
+    color: #2e7d32;
+    flex-shrink: 0;
+}
+
+.completed-banner-text h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #1b5e20;
+    font-weight: 700;
+}
+
+.completed-banner-text p {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    color: #2e7d32;
+    line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+    .button-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+
 @media (max-width: 900px) {
     .hero {
         grid-template-columns: 1fr;

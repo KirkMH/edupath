@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock %}
 
+
+
 {% block content %}
         <section class="hero">
             <div class="hero-content">
@@ -32,6 +34,20 @@
                 <h2>Assessment Flow</h2>
                 <p>Here's how the assessment works.</p>
             </div>
+
+            {% if has_taken_assessment %}
+            <div class="completed-banner">
+                <i class="fa-solid fa-circle-check"></i>
+                <div class="completed-banner-text">
+                    <h4>Assessment Completed</h4>
+                    <p>
+                        {% if assessment_result and assessment_result.top_recommended_program %}
+                            Your top recommendation was <strong>{{ assessment_result.top_recommended_program.program_name }}</strong>{% if assessment_result.top_recommended_program.abbreviation %} (<strong>{{ assessment_result.top_recommended_program.abbreviation }}</strong>){% endif %}.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="steps">
                 <div class="step">
@@ -68,9 +84,50 @@
                 </div>
             </div>
 
+            {% if has_taken_assessment %}
+            <div class="button-group">
+                <button class="start-button" onclick="window.location.href='{% url 'result' %}'">
+                    <i class="fa-solid fa-chart-pie" style="margin-right: 8px;"></i>
+                    View Assessment Results
+                </button>
+                <button class="button-secondary" type="button" onclick="confirmRetake()">
+                    <i class="fa-solid fa-rotate-right" style="margin-right: 8px;"></i>
+                    Retake Assessment
+                </button>
+            </div>
+            <p class="retake-info-note" style="margin-top: 14px; font-size: 13px; color: #475569; text-align: center; line-height: 1.4;">
+                <i class="fa-solid fa-circle-info" style="margin-right: 5px; color: #0284c7;"></i>
+                <strong>Note:</strong> Clicking <em>Retake Assessment</em> will reset your previous answers and calculated recommendations so you can complete a fresh evaluation.
+            </p>
+            {% else %}
             <button class="start-button" onclick="window.location.href='{% url 'aptitude_ready' %}'">
                 Start Assessment
                 <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
             </button>
+            {% endif %}
         </section>
+{% endblock %}
+
+{% block js %}
+<script>
+function confirmRetake() {
+    Swal.fire({
+        title: 'Retake Assessment?',
+        text: 'This will reset your previous responses and calculated recommendations so you can complete a fresh evaluation.',
+        icon: 'question',
+        iconColor: '#35a84a',
+        showCancelButton: true,
+        confirmButtonColor: '#35a84a',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: '<i class="fa-solid fa-rotate-right" style="margin-right: 6px;"></i> Yes, Retake Now',
+        cancelButtonText: 'Cancel',
+        borderRadius: '12px',
+        focusCancel: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'retake_assessment' %}";
+        }
+    });
+}
+</script>
 {% endblock %}

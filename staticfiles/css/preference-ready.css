@@ -8,13 +8,13 @@
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 1.5px;
-    color: #38bdf8;
-    background: rgba(56, 189, 248, 0.12);
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
     padding: 4px 12px;
     border-radius: 20px;
     display: inline-block;
     margin-bottom: 6px;
-    border: 1px solid rgba(56, 189, 248, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .riasec-badge-header h3 {
@@ -45,7 +45,7 @@
 .riasec-card:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
-    border-color: rgba(56, 189, 248, 0.4);
+    border-color: rgba(16, 185, 129, 0.4);
 }
 
 .riasec-card .letter {

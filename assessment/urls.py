@@ -15,5 +15,7 @@ urlpatterns = [
     path('loading/', views.loading, name='loading'),
     path('process-results/', views.process_results, name='process_results'),
     path('result/', views.result, name='result'),
+    path('retake/', views.retake_assessment, name='retake_assessment'),
 ]
+
 

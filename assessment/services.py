@@ -195,10 +195,49 @@ def get_riasec_results(student_profile):
 
 
 
+LEVEL_RANK = {
+    'Very High': 5,
+    'High': 4,
+    'Moderate': 3,
+    'Low': 2,
+    'Very Low': 1,
+    'Not Applicable': 0,
+}
+
+
+def lookup_score_interpretation(score_percentage):
+    """
+    Looks up qualitative performance tier label ('Very High', 'High', 'Moderate', 'Low', 'Very Low')
+    from ScoreInterpretation model in DB based on score_percentage (0.00 - 100.00%).
+    """
+    from customization.models import ScoreInterpretation
+    try:
+        tiers = ScoreInterpretation.objects.all()
+        for tier in tiers:
+            if float(tier.min_score) <= float(score_percentage) <= float(tier.max_score):
+                return tier.label
+    except Exception:
+        pass
+
+    # Default fallback interpretation tiers
+    val = float(score_percentage)
+    if val >= 80.0:
+        return 'Very High'
+    elif val >= 60.0:
+        return 'High'
+    elif val >= 40.0:
+        return 'Moderate'
+    elif val >= 20.0:
+        return 'Low'
+    else:
+        return 'Very Low'
+
+
 def calculate_aptitude_dimension_scores(student_profile):
     """
-    Calculates percentage score (0-100) for each of the 6 aptitude dimensions:
+    Calculates normalized percentage score (0-100%) for each of the 6 aptitude dimensions:
     numerical, logical, problem_solving, spatial, technical, verbal.
+    Includes Aptitude Question Count Guard (default 8 per dimension or active DB question count).
     """
     from .models import StudentAptitudeResponse
     from customization.models import AptitudeQuestion
@@ -223,17 +262,14 @@ def calculate_aptitude_dimension_scores(student_profile):
         responses_by_dim[dim].append(resp.is_correct)
 
     for dim_name, field_name in dimension_field_map.items():
-        dim_questions_count = AptitudeQuestion.objects.filter(dimension=dim_name, status=True).count()
+        # Question Count Guard: default 8 per dimension, or active DB count if present
+        db_questions_count = AptitudeQuestion.objects.filter(dimension=dim_name, status=True).count()
+        max_possible_score = db_questions_count if db_questions_count > 0 else 8
+
         user_resps = responses_by_dim.get(dim_name, [])
         correct_count = sum(1 for is_correct in user_resps if is_correct)
 
-        if dim_questions_count > 0:
-            percentage = round((correct_count / dim_questions_count) * 100)
-        elif len(user_resps) > 0:
-            percentage = round((correct_count / len(user_resps)) * 100)
-        else:
-            percentage = 0
-
+        percentage = round((correct_count / max_possible_score) * 100)
         aptitude_scores[field_name] = min(100, max(0, percentage))
 
     return aptitude_scores
@@ -241,25 +277,32 @@ def calculate_aptitude_dimension_scores(student_profile):
 
 def calculate_program_recommendations(student_profile, aptitude_scores, riasec_scores):
     """
-    Evaluates all Programs using ProgramCriteria weights and thresholds to rank
-    the top 3 recommended degree programs and overall alignment level.
+    Evaluates all Programs using ProgramCriteria weights, threshold evaluation (0.5 penalty if < minimum),
+    and ScoreInterpretation model for overall alignment level determination.
     """
     from customization.models import Program, ProgramCriteria
 
+    # Map normalized scores (0 - 100%) across all 12 dimensions
     dim_to_student_score = {
-        'Numerical Reasoning': aptitude_scores.get('numerical_score', 0),
-        'Logical Reasoning': aptitude_scores.get('logical_score', 0),
-        'Problem-Solving': aptitude_scores.get('problem_solving_score', 0),
-        'Spatial Ability': aptitude_scores.get('spatial_score', 0),
-        'Technical/Mechanical Reasoning': aptitude_scores.get('technical_score', 0),
-        'Verbal/Communication Ability': aptitude_scores.get('verbal_score', 0),
-        # RIASEC scores (0-40 scale normalized to 0-100)
-        'Realistic': min(100.0, (riasec_scores.get('r_score', 0) / 40.0) * 100.0),
-        'Investigative': min(100.0, (riasec_scores.get('i_score', 0) / 40.0) * 100.0),
-        'Artistic': min(100.0, (riasec_scores.get('a_score', 0) / 40.0) * 100.0),
-        'Social': min(100.0, (riasec_scores.get('s_score', 0) / 40.0) * 100.0),
-        'Enterprising': min(100.0, (riasec_scores.get('e_score', 0) / 40.0) * 100.0),
-        'Conventional': min(100.0, (riasec_scores.get('c_score', 0) / 40.0) * 100.0),
+        'Numerical Reasoning': float(aptitude_scores.get('numerical_score', 0)),
+        'Logical Reasoning': float(aptitude_scores.get('logical_score', 0)),
+        'Problem-Solving': float(aptitude_scores.get('problem_solving_score', 0)),
+        'Spatial Ability': float(aptitude_scores.get('spatial_score', 0)),
+        'Technical/Mechanical Reasoning': float(aptitude_scores.get('technical_score', 0)),
+        'Verbal/Communication Ability': float(aptitude_scores.get('verbal_score', 0)),
+        # Preference RIASEC scores (0-40 raw scale normalized to 0-100%)
+        'Realistic': min(100.0, (float(riasec_scores.get('r_score', 0)) / 40.0) * 100.0),
+        'Investigative': min(100.0, (float(riasec_scores.get('i_score', 0)) / 40.0) * 100.0),
+        'Artistic': min(100.0, (float(riasec_scores.get('a_score', 0)) / 40.0) * 100.0),
+        'Social': min(100.0, (float(riasec_scores.get('s_score', 0)) / 40.0) * 100.0),
+        'Enterprising': min(100.0, (float(riasec_scores.get('e_score', 0)) / 40.0) * 100.0),
+        'Conventional': min(100.0, (float(riasec_scores.get('c_score', 0)) / 40.0) * 100.0),
+    }
+
+    # Map student's qualitative interpretation level per dimension using ScoreInterpretation model
+    dim_to_student_level = {
+        dim_name: lookup_score_interpretation(score_val)
+        for dim_name, score_val in dim_to_student_score.items()
     }
 
     programs = Program.objects.all()
@@ -273,15 +316,35 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
         for crit in criteria:
             w = float(crit.weight)
             total_weight += w
-            score_val = dim_to_student_score.get(crit.dimension_name, 0.0)
-            total_score += (score_val * w)
+            norm_score = dim_to_student_score.get(crit.dimension_name, 0.0)
+            student_level_label = dim_to_student_level.get(crit.dimension_name, 'Very Low')
 
-        # Normalize score if total_weight > 0
+            # Threshold Multiplier Evaluation
+            req_level = crit.minimum_level
+            if req_level == 'Not Applicable':
+                multiplier = 1.0
+            else:
+                student_rank = LEVEL_RANK.get(student_level_label, 0)
+                required_rank = LEVEL_RANK.get(req_level, 0)
+                if student_rank >= required_rank:
+                    multiplier = 1.0
+                else:
+                    multiplier = 0.5  # Requirement penalty multiplier
+
+            total_score += (norm_score * w * multiplier)
+
         final_score = (total_score / total_weight) if total_weight > 0 else total_score
-        program_rankings.append((prog, final_score))
 
-    # Sort descending by final score
-    program_rankings.sort(key=lambda x: x[1], reverse=True)
+        # Secondary tie-breaker score based on primary RIASEC code match
+        top_riasec_char = riasec_scores.get('riasec_code', 'R-I-A').split('-')[0]
+        riasec_char_map = {'R': 'Realistic', 'I': 'Investigative', 'A': 'Artistic', 'S': 'Social', 'E': 'Enterprising', 'C': 'Conventional'}
+        primary_dim_name = riasec_char_map.get(top_riasec_char, 'Realistic')
+        primary_riasec_score = dim_to_student_score.get(primary_dim_name, 0.0)
+
+        program_rankings.append((prog, final_score, primary_riasec_score))
+
+    # Sort descending by final_score, then primary_riasec_score
+    program_rankings.sort(key=lambda x: (x[1], x[2]), reverse=True)
 
     top_prog = program_rankings[0][0] if len(program_rankings) > 0 else None
     sec_prog = program_rankings[1][0] if len(program_rankings) > 1 else None
@@ -289,14 +352,8 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
 
     top_score = program_rankings[0][1] if len(program_rankings) > 0 else 0.0
 
-    if top_score >= 70.0:
-        alignment_level = 'Very High'
-    elif top_score >= 55.0:
-        alignment_level = 'High'
-    elif top_score >= 40.0:
-        alignment_level = 'Moderate'
-    else:
-        alignment_level = 'Low'
+    # Overall Alignment Level: determined by passing top_score through ScoreInterpretation model tiers
+    alignment_level = lookup_score_interpretation(top_score)
 
     explanation = (
         f"Based on your cognitive aptitude assessment and O*NET RIASEC interest profile ({riasec_scores.get('riasec_code', '')}), "
@@ -310,6 +367,7 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
         'alignment_level': alignment_level,
         'generated_explanation': explanation,
     }
+
 
 
 def calculate_and_save_assessment_results(student_profile):

@@ -185,6 +185,7 @@ class ActivityLog(models.Model):
         ('FAILED_PASSWORD_RESET', 'Failed Password Reset'),
         ('ACCOUNT_LOCKED', 'Account Locked'),
         ('ASSESSMENT_COMPLETED', 'Assessment Completed'),
+        ('ASSESSMENT_RETAKEN', 'Assessment Retaken / Reset'),
     ]
 
     log_id = models.AutoField(primary_key=True, verbose_name="Log ID")

@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from customization.models import AptitudeQuestion, ActivityLog, check_and_lock_account
 from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse, AssessmentResult
-from .services import sync_interest_questions, calculate_and_save_assessment_results
+from .services import sync_interest_questions, calculate_and_save_assessment_results, lookup_score_interpretation
 
 
 
@@ -331,26 +331,55 @@ def signout(request):
 @login_required(login_url='signin')
 def dashboard(request):
     student_name = "Student"
+    has_taken_assessment = False
+    assessment_result = None
+
     if request.user.is_authenticated:
         profile = getattr(request.user, 'student_profile', None)
-        if profile and profile.full_name:
-            student_name = profile.full_name
-        elif request.user.first_name:
-            student_name = request.user.first_name
-        elif request.user.username:
-            student_name = request.user.username
+        if profile:
+            if profile.full_name:
+                student_name = profile.full_name
+            elif request.user.first_name:
+                student_name = request.user.first_name
+            elif request.user.username:
+                student_name = request.user.username
+
+            assessment_result = getattr(profile, 'assessment_result', None)
+            if assessment_result:
+                has_taken_assessment = True
+            elif StudentAptitudeResponse.objects.filter(student=profile).exists() or StudentInterestResponse.objects.filter(student=profile).exists():
+                has_taken_assessment = True
 
     if student_name:
         student_name = student_name.title()
 
     return render(request, 'assessment/dashboard.html', {
-        'student_name': student_name
+        'student_name': student_name,
+        'has_taken_assessment': has_taken_assessment,
+        'assessment_result': assessment_result,
     })
+
+
+@login_required(login_url='signin')
+def retake_assessment(request):
+    student_profile = getattr(request.user, 'student_profile', None)
+    if student_profile:
+        # Reset existing responses and calculated result for a fresh start
+        StudentAptitudeResponse.objects.filter(student=student_profile).delete()
+        StudentInterestResponse.objects.filter(student=student_profile).delete()
+        AssessmentResult.objects.filter(student=student_profile).delete()
+        ActivityLog.objects.create(
+            user=request.user,
+            action='ASSESSMENT_RETAKEN',
+            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) reset their assessment for a fresh retake."
+        )
+    return redirect('aptitude_ready')
 
 
 @login_required(login_url='signin')
 def aptitude_ready(request):
     return render(request, 'assessment/aptitude-ready.html')
+
 
 
 @login_required(login_url='signin')
@@ -460,7 +489,179 @@ def process_results(request):
 
 @login_required(login_url='signin')
 def result(request):
-    return render(request, 'assessment/result.html')
+    student_profile = getattr(request.user, 'student_profile', None)
+    if not student_profile:
+        return redirect('dashboard')
+
+    assessment_result = getattr(student_profile, 'assessment_result', None)
+    if not assessment_result:
+        assessment_result = calculate_and_save_assessment_results(student_profile)
+
+    # Aptitude Scores Breakdown
+    aptitude_items = [
+        {
+            'name': 'Verbal Reasoning',
+            'score': assessment_result.verbal_score,
+            'label': lookup_score_interpretation(assessment_result.verbal_score),
+            'icon': 'fa-regular fa-comment-dots',
+        },
+        {
+            'name': 'Numerical Reasoning',
+            'score': assessment_result.numerical_score,
+            'label': lookup_score_interpretation(assessment_result.numerical_score),
+            'icon': 'fa-solid fa-calculator',
+        },
+        {
+            'name': 'Logical Reasoning',
+            'score': assessment_result.logical_score,
+            'label': lookup_score_interpretation(assessment_result.logical_score),
+            'icon': 'fa-solid fa-brain',
+        },
+        {
+            'name': 'Spatial Ability',
+            'score': assessment_result.spatial_score,
+            'label': lookup_score_interpretation(assessment_result.spatial_score),
+            'icon': 'fa-solid fa-drafting-compass',
+        },
+        {
+            'name': 'Technical/Mechanical Reasoning',
+            'score': assessment_result.technical_score,
+            'label': lookup_score_interpretation(assessment_result.technical_score),
+            'icon': 'fa-solid fa-gear',
+        },
+        {
+            'name': 'Problem-Solving',
+            'score': assessment_result.problem_solving_score,
+            'label': lookup_score_interpretation(assessment_result.problem_solving_score),
+            'icon': 'fa-solid fa-lightbulb',
+        },
+    ]
+
+    # RIASEC Area Scores Breakdown (Raw scores 0-40 -> Normalized %)
+    r_pct = min(100, round((assessment_result.r_score / 40.0) * 100))
+    i_pct = min(100, round((assessment_result.i_score / 40.0) * 100))
+    a_pct = min(100, round((assessment_result.a_score / 40.0) * 100))
+    s_pct = min(100, round((assessment_result.s_score / 40.0) * 100))
+    e_pct = min(100, round((assessment_result.e_score / 40.0) * 100))
+    c_pct = min(100, round((assessment_result.c_score / 40.0) * 100))
+
+    riasec_items = [
+        {
+            'code_letter': 'R',
+            'title': 'Realistic',
+            'raw_score': assessment_result.r_score,
+            'percentage': r_pct,
+            'level': lookup_score_interpretation(r_pct),
+        },
+        {
+            'code_letter': 'I',
+            'title': 'Investigative',
+            'raw_score': assessment_result.i_score,
+            'percentage': i_pct,
+            'level': lookup_score_interpretation(i_pct),
+        },
+        {
+            'code_letter': 'A',
+            'title': 'Artistic',
+            'raw_score': assessment_result.a_score,
+            'percentage': a_pct,
+            'level': lookup_score_interpretation(a_pct),
+        },
+        {
+            'code_letter': 'S',
+            'title': 'Social',
+            'raw_score': assessment_result.s_score,
+            'percentage': s_pct,
+            'level': lookup_score_interpretation(s_pct),
+        },
+        {
+            'code_letter': 'E',
+            'title': 'Enterprising',
+            'raw_score': assessment_result.e_score,
+            'percentage': e_pct,
+            'level': lookup_score_interpretation(e_pct),
+        },
+        {
+            'code_letter': 'C',
+            'title': 'Conventional',
+            'raw_score': assessment_result.c_score,
+            'percentage': c_pct,
+            'level': lookup_score_interpretation(c_pct),
+        },
+    ]
+
+    # Curated Descriptions for Cognitive Aptitudes
+    APTITUDE_DESCRIPTIONS = {
+        'Verbal Reasoning': 'Demonstrates strong capability in understanding written ideas, analyzing language, and communicating complex concepts effectively.',
+        'Numerical Reasoning': 'Demonstrates proficiency in quantitative analysis, mathematical reasoning, interpreting statistical data, and working with numbers.',
+        'Logical Reasoning': 'Demonstrates strong analytical thinking, recognizing logical patterns, evaluating arguments, and drawing sound conclusions.',
+        'Spatial Ability': 'Demonstrates high capacity for visualizing 3D objects, understanding spatial relationships, and conceptualizing structural layouts.',
+        'Technical/Mechanical Reasoning': 'Demonstrates strong understanding of mechanical principles, physical forces, machinery operations, and practical tools.',
+        'Problem-Solving': 'Demonstrates high ability to diagnose complex challenges, break down multifaceted issues, and execute effective solutions.',
+    }
+
+    # Curated O*NET Descriptions for RIASEC Themes
+    RIASEC_DESCRIPTIONS = {
+        'R': {
+            'title': 'Realistic (Doers)',
+            'description': 'Prefers practical, hands-on activities, working with tools, machinery, materials, or physical tasks in tangible environments.'
+        },
+        'I': {
+            'title': 'Investigative (Thinkers)',
+            'description': 'Prefers analytical, scientific, and research-oriented tasks involving problem-solving, data analysis, and intellectual inquiry.'
+        },
+        'A': {
+            'title': 'Artistic (Creators)',
+            'description': 'Prefers creative self-expression, original design, visual or literary arts, and innovative projects without rigid rules.'
+        },
+        'S': {
+            'title': 'Social (Helpers)',
+            'description': 'Prefers assisting, teaching, mentoring, and empowering others in collaborative, people-focused environments.'
+        },
+        'E': {
+            'title': 'Enterprising (Persuaders)',
+            'description': 'Prefers leading teams, managing projects, persuading others, taking strategic business initiative, and achieving goals.'
+        },
+        'C': {
+            'title': 'Conventional (Organizers)',
+            'description': 'Prefers structured workflows, systematic data management, attention to detail, accuracy, and organized record-keeping.'
+        },
+    }
+
+    # Sort and extract Top 3 Aptitudes
+    top_aptitudes = sorted(aptitude_items, key=lambda x: x['score'], reverse=True)[:3]
+    for item in top_aptitudes:
+        item['description'] = APTITUDE_DESCRIPTIONS.get(item['name'], '')
+
+    # Sort and extract Top 3 RIASEC Interest Themes
+    top_riasec = sorted(riasec_items, key=lambda x: x['percentage'], reverse=True)[:3]
+    for item in top_riasec:
+        info = RIASEC_DESCRIPTIONS.get(item['code_letter'], {})
+        item['full_title'] = info.get('title', item['title'])
+        item['description'] = info.get('description', '')
+
+    # Calculate dynamic SVG Radar polygon and dot points
+    r_pt = (150, round(120 - 90 * (r_pct / 100.0), 1))
+    i_pt = (round(150 + 77.94 * (i_pct / 100.0), 1), round(120 - 45 * (i_pct / 100.0), 1))
+    a_pt = (round(150 + 77.94 * (a_pct / 100.0), 1), round(120 + 45 * (a_pct / 100.0), 1))
+    s_pt = (150, round(120 + 90 * (s_pct / 100.0), 1))
+    e_pt = (round(150 - 77.94 * (e_pct / 100.0), 1), round(120 + 45 * (e_pct / 100.0), 1))
+    c_pt = (round(150 - 77.94 * (c_pct / 100.0), 1), round(120 - 45 * (c_pct / 100.0), 1))
+
+    radar_polygon = f"{r_pt[0]},{r_pt[1]} {i_pt[0]},{i_pt[1]} {a_pt[0]},{a_pt[1]} {s_pt[0]},{s_pt[1]} {e_pt[0]},{e_pt[1]} {c_pt[0]},{c_pt[1]}"
+    radar_dots = [r_pt, i_pt, a_pt, s_pt, e_pt, c_pt]
+
+    return render(request, 'assessment/result.html', {
+        'result': assessment_result,
+        'aptitude_items': aptitude_items,
+        'riasec_items': riasec_items,
+        'top_aptitudes': top_aptitudes,
+        'top_riasec': top_riasec,
+        'radar_polygon': radar_polygon,
+        'radar_dots': radar_dots,
+    })
+
+
 
 
 
