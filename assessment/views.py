@@ -5,9 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
+from django.http import JsonResponse
 from customization.models import AptitudeQuestion, ActivityLog, check_and_lock_account
-from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse
-from .services import sync_interest_questions
+from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse, AssessmentResult
+from .services import sync_interest_questions, calculate_and_save_assessment_results
+
 
 
 def index(request):
@@ -435,7 +437,30 @@ def loading(request):
 
 
 @login_required(login_url='signin')
+def process_results(request):
+    """
+    AJAX endpoint called during loading page to calculate RIASEC scores via O*NET,
+    individual aptitude dimension scores, and program recommendations.
+    """
+    student_profile = getattr(request.user, 'student_profile', None)
+    if not student_profile:
+        return JsonResponse({'status': 'error', 'message': 'Student profile not found'}, status=400)
+
+    try:
+        result_obj = calculate_and_save_assessment_results(student_profile)
+        return JsonResponse({
+            'status': 'success',
+            'result_id': result_obj.result_id,
+            'riasec_code': result_obj.riasec_code,
+            'alignment_level': result_obj.alignment_level,
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required(login_url='signin')
 def result(request):
     return render(request, 'assessment/result.html')
+
 
 

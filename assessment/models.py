@@ -106,8 +106,14 @@ class AssessmentResult(models.Model):
         related_name='assessment_result',
         verbose_name="Student"
     )
-    # Serialized map of dimension -> normalized score
-    aptitude_scores_json = models.JSONField(verbose_name="Aptitude Scores")
+    # Individual Aptitude Dimension Scores (Percentages 0-100)
+    numerical_score = models.PositiveIntegerField(default=0, verbose_name="Numerical Reasoning Score")
+    logical_score = models.PositiveIntegerField(default=0, verbose_name="Logical Reasoning Score")
+    problem_solving_score = models.PositiveIntegerField(default=0, verbose_name="Problem-Solving Score")
+    spatial_score = models.PositiveIntegerField(default=0, verbose_name="Spatial Ability Score")
+    technical_score = models.PositiveIntegerField(default=0, verbose_name="Technical/Mechanical Reasoning Score")
+    verbal_score = models.PositiveIntegerField(default=0, verbose_name="Verbal/Communication Ability Score")
+
     r_score = models.PositiveIntegerField(verbose_name="R Score")
     i_score = models.PositiveIntegerField(verbose_name="I Score")
     a_score = models.PositiveIntegerField(verbose_name="A Score")

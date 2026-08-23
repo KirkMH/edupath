@@ -13,5 +13,7 @@ urlpatterns = [
     path('preference-ready/', views.preference_ready, name='preference_ready'),
     path('assess-preference/', views.assess_preference, name='assess_preference'),
     path('loading/', views.loading, name='loading'),
+    path('process-results/', views.process_results, name='process_results'),
     path('result/', views.result, name='result'),
 ]
+

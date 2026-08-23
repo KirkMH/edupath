@@ -110,6 +110,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPct = 0;
     const stepDurationMs = 1000; // time per step stage (5 seconds total)
 
+    // Trigger backend processing asynchronously
+    const processPromise = fetch("{% url 'process_results' %}", {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }).then(response => response.json())
+      .catch(err => {
+          console.error("Error processing assessment results:", err);
+          return { status: 'error' };
+      });
+
     function updateCenterIcon(iconClass) {
         if (centerIcon) {
             centerIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
@@ -137,14 +149,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function processStep(index) {
         if (index >= stepsData.length) {
-            // All steps completed!
-            if (stageTitle) stageTitle.textContent = "All evaluations completed successfully!";
-            if (completionBanner) completionBanner.style.display = 'flex';
-            
-            // Navigate automatically to the results page after a brief pause
-            setTimeout(function() {
-                window.location.href = "{% url 'result' %}";
-            }, 1200);
+            // Wait for backend processing API call to finish if still in flight
+            processPromise.then(() => {
+                if (stageTitle) stageTitle.textContent = "All evaluations completed successfully!";
+                if (completionBanner) completionBanner.style.display = 'flex';
+                
+                // Navigate automatically to the results page after a brief pause
+                setTimeout(function() {
+                    window.location.href = "{% url 'result' %}";
+                }, 1200);
+            });
             return;
         }
 
@@ -173,5 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
         processStep(0);
     }, 400);
 });
+
 </script>
 {% endblock %}
