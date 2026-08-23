@@ -307,10 +307,12 @@ body.auth-body {
     color: #35a84a;
 }
 
-.auth-footer {
+.auth-footer,
+footer.footer,
+.footer {
     margin-top: 20px;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 12px;
+    font-size: 12.5px;
     text-align: center;
 }
 
