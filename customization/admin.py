@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Program, AptitudeQuestion, ProgramCriteria, Rule, ScoreInterpretation, InterestQuestion, ActivityLog
+from django.db.models import Case, When, Value, IntegerField
+from .models import Program, AptitudeQuestion, ProgramCriteria, ScoreInterpretation, InterestQuestion, ActivityLog, DEFAULT_DIMENSIONS, DEFAULT_SCORE_TIERS
+
+
+
 
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -40,10 +44,47 @@ class CustomUserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser')
 
 
+class ProgramCriteriaInline(admin.TabularInline):
+    model = ProgramCriteria
+    extra = 0
+    max_num = 0
+    can_delete = False
+    fields = ('dimension_name', 'weight', 'minimum_level')
+    readonly_fields = ('dimension_name',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        whens = [When(dimension_name=dim, then=Value(i)) for i, dim in enumerate(DEFAULT_DIMENSIONS)]
+        return qs.annotate(
+            custom_order=Case(*whens, default=Value(99), output_field=IntegerField())
+        ).order_by('custom_order')
+
+
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
     list_display = ('abbreviation', 'program_name', 'created_at')
     search_fields = ('program_name', 'abbreviation')
+    inlines = [ProgramCriteriaInline]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        if obj:
+            for dim in DEFAULT_DIMENSIONS:
+                ProgramCriteria.objects.get_or_create(
+                    program=obj,
+                    dimension_name=dim,
+                    defaults={
+                        'weight': 0.00,
+                        'minimum_level': 'Not Applicable'
+                    }
+                )
+        return super().get_formsets_with_inlines(request, obj)
+
 
 
 @admin.register(AptitudeQuestion)
@@ -57,26 +98,38 @@ class AptitudeQuestionAdmin(admin.ModelAdmin):
     question_text_short.short_description = 'Question Text'
 
 
-@admin.register(ProgramCriteria)
-class ProgramCriteriaAdmin(admin.ModelAdmin):
-    list_display = ('program', 'dimension_name', 'weight', 'minimum_level')
-    list_filter = ('program', 'dimension_name')
-    search_fields = ('dimension_name', 'program__abbreviation', 'program__program_name')
 
-
-@admin.register(Rule)
-class RuleAdmin(admin.ModelAdmin):
-    list_display = ('rule_id', 'program', 'condition_expression', 'score_adjustment', 'status')
-    list_filter = ('program', 'status')
-    search_fields = ('condition_expression', 'program__abbreviation', 'program__program_name')
 
 
 @admin.register(ScoreInterpretation)
 class ScoreInterpretationAdmin(admin.ModelAdmin):
-    list_display = ('label', 'min_score', 'max_score', 'order')
-    list_filter = ('label',)
-    search_fields = ('label', 'description')
-    ordering = ('order', 'min_score')
+    list_display = ('label', 'min_score', 'max_score')
+    readonly_fields = ('label',)
+    fields = ('label', 'min_score', 'max_score')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        for label, default_min, default_max in DEFAULT_SCORE_TIERS:
+            ScoreInterpretation.objects.get_or_create(
+                label=label,
+                defaults={'min_score': default_min, 'max_score': default_max}
+            )
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        tiers = [t[0] for t in DEFAULT_SCORE_TIERS]
+        whens = [When(label=tier_name, then=Value(i)) for i, tier_name in enumerate(tiers)]
+        return qs.filter(label__in=tiers).annotate(
+            tier_order=Case(*whens, default=Value(99), output_field=IntegerField())
+        ).order_by('tier_order')
+
+
 
 
 @admin.register(InterestQuestion)

@@ -1,4 +1,21 @@
 from django.db import models
+from django.db.models.signals import post_save
+
+DEFAULT_DIMENSIONS = [
+    'Numerical Reasoning',
+    'Logical Reasoning',
+    'Problem-Solving',
+    'Spatial Ability',
+    'Technical/Mechanical Reasoning',
+    'Verbal/Communication Ability',
+    'Realistic',
+    'Investigative',
+    'Artistic',
+    'Social',
+    'Enterprising',
+    'Conventional',
+]
+
 
 class Program(models.Model):
     """
@@ -21,15 +38,13 @@ class AptitudeQuestion(models.Model):
     """
     DIMENSION_CHOICES = [
         ('Numerical Reasoning', 'Numerical Reasoning'),
-        ('Deductive Reasoning', 'Deductive Reasoning'),
-        ('Inductive Reasoning', 'Inductive Reasoning'),
-        ('Problem Sensitivity', 'Problem Sensitivity'),
-        ('Visualization', 'Visualization'),
-        ('Information Ordering', 'Information Ordering'),
-        ('Oral Comprehension', 'Oral Comprehension'),
-        ('Oral Expression', 'Oral Expression'),
-        ('Originality', 'Originality'),
+        ('Logical Reasoning', 'Logical Reasoning'),
+        ('Problem-Solving', 'Problem-Solving'),
+        ('Spatial Ability', 'Spatial Ability'),
+        ('Technical/Mechanical Reasoning', 'Technical/Mechanical Reasoning'),
+        ('Verbal/Communication Ability', 'Verbal/Communication Ability'),
     ]
+
 
     ANSWER_CHOICES = [
         ('A', 'A'),
@@ -88,6 +103,15 @@ class ProgramCriteria(models.Model):
     """
     Configurable scoring weights and minimum thresholds per program and dimension.
     """
+    MINIMUM_LEVEL_CHOICES = [
+        ('Very High', 'Very High'),
+        ('High', 'High'),
+        ('Moderate', 'Moderate'),
+        ('Low', 'Low'),
+        ('Very Low', 'Very Low'),
+        ('Not Applicable', 'Not Applicable'),
+    ]
+
     criterion_id = models.AutoField(primary_key=True, verbose_name="Criterion ID")
     program = models.ForeignKey(
         'customization.Program',
@@ -96,8 +120,13 @@ class ProgramCriteria(models.Model):
         verbose_name="Program"
     )
     dimension_name = models.CharField(max_length=100, verbose_name="Dimension Name")
-    weight = models.DecimalField(max_digits=5, decimal_places=2, default=1.00, verbose_name="Weight")
-    minimum_level = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="Minimum Level")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, verbose_name="Weight")
+    minimum_level = models.CharField(
+        max_length=20,
+        choices=MINIMUM_LEVEL_CHOICES,
+        default='Not Applicable',
+        verbose_name="Minimum Level"
+    )
 
     def __str__(self):
         return f"{self.program.abbreviation} Criteria - {self.dimension_name} (weight={self.weight})"
@@ -106,42 +135,36 @@ class ProgramCriteria(models.Model):
         verbose_name_plural = "Program Criteria"
 
 
-class Rule(models.Model):
-    """
-    IF-THEN evaluation rules and user-facing justification templates.
-    """
-    rule_id = models.AutoField(primary_key=True, verbose_name="Rule ID")
-    program = models.ForeignKey(
-        'customization.Program',
-        on_delete=models.CASCADE,
-        related_name='rules',
-        verbose_name="Program"
-    )
-    condition_expression = models.TextField(verbose_name="Condition Expression")
-    score_adjustment = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Score Adjustment")
-    explanation_template = models.TextField(verbose_name="Explanation Template")
-    status = models.BooleanField(default=True, verbose_name="Status")
 
-    def __str__(self):
-        return f"Rule {self.rule_id} for {self.program.abbreviation}"
+
+
+DEFAULT_SCORE_TIERS = [
+    ('Very High', 80.00, 100.00),
+    ('High', 60.00, 79.99),
+    ('Moderate', 40.00, 59.99),
+    ('Low', 20.00, 39.99),
+    ('Very Low', 0.00, 19.99),
+]
 
 
 class ScoreInterpretation(models.Model):
     """
     Configurable score ranges and qualitative performance tier bands.
     """
+    TIER_CHOICES = [(tier[0], tier[0]) for tier in DEFAULT_SCORE_TIERS]
+
     id = models.AutoField(primary_key=True, verbose_name="ID")
-    label = models.CharField(max_length=50, unique=True, verbose_name="Label")
+    label = models.CharField(max_length=50, unique=True, choices=TIER_CHOICES, verbose_name="Label")
     min_score = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Minimum Score")
     max_score = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Maximum Score")
-    description = models.TextField(blank=True, null=True, verbose_name="Description")
-    order = models.PositiveSmallIntegerField(default=0, verbose_name="Order")
 
     def __str__(self):
         return f"{self.label} ({self.min_score} - {self.max_score})"
 
     class Meta:
-        verbose_name_plural = "Score Interpretations"
+        verbose_name = "Score Interpretation Config"
+        verbose_name_plural = "Score Interpretation Config"
+
 
 
 from django.conf import settings
@@ -261,4 +284,18 @@ def log_user_login_failed(sender, credentials, request, **kwargs):
 
     if user_obj:
         check_and_lock_account(user_obj, 'FAILED_LOGIN')
-
+
+
+@receiver(post_save, sender=Program)
+def create_default_program_criteria(sender, instance, created, **kwargs):
+    for dim in DEFAULT_DIMENSIONS:
+        ProgramCriteria.objects.get_or_create(
+            program=instance,
+            dimension_name=dim,
+            defaults={
+                'weight': 0.00,
+                'minimum_level': 'Not Applicable'
+            }
+        )
+
+
