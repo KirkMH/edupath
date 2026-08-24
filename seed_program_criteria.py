@@ -18,7 +18,7 @@ PROGRAM_CRITERIA_MAP = {
         "Investigative": (0.10, "High"),
         "Conventional": (0.05, "Moderate"),
     },
-    "BSIT": {
+    "BS InfoTech": {
         "Logical Reasoning": (0.20, "High"),
         "Problem-Solving": (0.15, "High"),
         "Numerical Reasoning": (0.10, "Moderate"),
@@ -30,7 +30,7 @@ PROGRAM_CRITERIA_MAP = {
         "Realistic": (0.05, "Moderate"),
         "Artistic": (0.05, "Not Applicable"),
     },
-    "BSIndTech": {
+    "BSIT": {
         "Technical/Mechanical Reasoning": (0.25, "High"),
         "Problem-Solving": (0.15, "High"),
         "Spatial Ability": (0.10, "Moderate"),
@@ -63,7 +63,7 @@ PROGRAM_CRITERIA_MAP = {
         "Realistic": (0.10, "High"),
         "Conventional": (0.05, "Moderate"),
     },
-    "BSArch": {
+    "BSA": {
         "Spatial Ability": (0.25, "Very High"),
         "Problem-Solving": (0.15, "High"),
         "Numerical Reasoning": (0.10, "High"),

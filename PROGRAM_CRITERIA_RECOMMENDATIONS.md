@@ -40,7 +40,7 @@ Each program is assigned a total weight of **1.00 (100%)** distributed across th
 
 ---
 
-### 2. Bachelor of Science in Information Technology (BSIT)
+### 2. Bachelor of Science in Information Technology (BS InfoTech)
 *Focus: Software development, database administration, networking, web systems, and IT support.*
 
 | Category | Dimension | Weight | Minimum Level | Rationale |
@@ -61,7 +61,7 @@ Each program is assigned a total weight of **1.00 (100%)** distributed across th
 
 ---
 
-### 3. Bachelor of Science in Industrial Technology (BSIndTech)
+### 3. Bachelor of Science in Industrial Technology (BSIT)
 *Focus: Industrial manufacturing, equipment operation, shop floor maintenance, fabrication, and quality control.*
 
 | Category | Dimension | Weight | Minimum Level | Rationale |
@@ -103,7 +103,7 @@ Each program is assigned a total weight of **1.00 (100%)** distributed across th
 
 ---
 
-### 5. Bachelor of Technical Vocational Teacher Education (BTVTEd)
+### 5. Bachelor of Technical Vocational Teacher Education (BTVTed)
 *Focus: Pedagogy, technical-vocational instruction, shop teaching, student assessment, and TVET curriculum delivery.*
 
 | Category | Dimension | Weight | Minimum Level | Rationale |
@@ -124,7 +124,7 @@ Each program is assigned a total weight of **1.00 (100%)** distributed across th
 
 ---
 
-### 6. Bachelor of Science in Architecture (BSArch)
+### 6. Bachelor of Science in Architecture (BSA)
 *Focus: Spatial layout, architectural drafting, visual design, building construction technology, and environmental design.*
 
 | Category | Dimension | Weight | Minimum Level | Rationale |
@@ -149,7 +149,7 @@ Each program is assigned a total weight of **1.00 (100%)** distributed across th
 
 The table below summarizes the recommended weight distribution across all 6 programs and 12 evaluation dimensions:
 
-| Dimension | Category | BSCE | BSIT | BSIndTech | BSHM | BTVTEd | BSArch |
+| Dimension | Category | BSCE | BS InfoTech | BSIT | BSHM | BTVTed | BSA |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Numerical Reasoning** | Aptitude | **0.20** | 0.10 | 0.10 | 0.10 | 0.05 | 0.10 |
 | **Logical Reasoning** | Aptitude | 0.10 | **0.20** | 0.05 | 0.10 | 0.05 | 0.10 |
@@ -193,7 +193,7 @@ PROGRAM_CRITERIA_MAP = {
         "Investigative": (0.10, "High"),
         "Conventional": (0.05, "Moderate"),
     },
-    "BSIT": {
+    "BS InfoTech": {
         "Logical Reasoning": (0.20, "High"),
         "Problem-Solving": (0.15, "High"),
         "Numerical Reasoning": (0.10, "Moderate"),
@@ -205,7 +205,7 @@ PROGRAM_CRITERIA_MAP = {
         "Realistic": (0.05, "Moderate"),
         "Artistic": (0.05, "Not Applicable"),
     },
-    "BSIndTech": {
+    "BSIT": {
         "Technical/Mechanical Reasoning": (0.25, "High"),
         "Problem-Solving": (0.15, "High"),
         "Spatial Ability": (0.10, "Moderate"),
@@ -227,7 +227,7 @@ PROGRAM_CRITERIA_MAP = {
         "Enterprising": (0.10, "High"),
         "Conventional": (0.05, "Moderate"),
     },
-    "BTVTEd": {
+    "BTVTed": {
         "Verbal/Communication Ability": (0.25, "High"),
         "Technical/Mechanical Reasoning": (0.15, "High"),
         "Problem-Solving": (0.15, "High"),
@@ -238,7 +238,7 @@ PROGRAM_CRITERIA_MAP = {
         "Realistic": (0.10, "High"),
         "Conventional": (0.05, "Moderate"),
     },
-    "BSArch": {
+    "BSA": {
         "Spatial Ability": (0.25, "Very High"),
         "Problem-Solving": (0.15, "High"),
         "Numerical Reasoning": (0.10, "High"),
