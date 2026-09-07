@@ -29,9 +29,9 @@ def signup(request):
 
     if request.method == 'POST':
         full_name = request.POST.get('fullName', '').strip()
-        student_id = request.POST.get('studentId', '').strip()
-        age_raw = request.POST.get('age', '').strip()
         sex = request.POST.get('sex', '').strip()
+        age_raw = request.POST.get('age', '').strip()
+        username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirmPassword', '')
@@ -44,14 +44,12 @@ def signup(request):
         # 1. Validate required fields (Email is optional!)
         if not full_name:
             errors.append("Full Name is required.")
-        if not student_id:
-            errors.append("Student ID / LRN is required.")
-        elif not student_id.isdigit() or len(student_id) != 12:
-            errors.append("Student ID / LRN must be exactly a 12-digit number.")
-        if not age_raw:
-            errors.append("Age is required.")
         if not sex:
             errors.append("Sex is required.")
+        if not age_raw:
+            errors.append("Age is required.")
+        if not username:
+            errors.append("Username is required.")
         if not password:
             errors.append("Password is required.")
         if not security_question:
@@ -71,22 +69,22 @@ def signup(request):
         if email and User.objects.filter(email__iexact=email).exclude(email='').exists():
             errors.append("An account with this email address is already registered.")
 
-        # 5. Student ID uniqueness validation
-        if student_id and StudentProfile.objects.filter(student_id__iexact=student_id).exists():
-            errors.append("This Student ID is already registered.")
+        # 5. Username uniqueness validation
+        if username and (User.objects.filter(username__iexact=username).exists() or StudentProfile.objects.filter(username__iexact=username).exists()):
+            errors.append("This Username is already registered.")
 
-        # 6. Full Name and Student ID pair uniqueness validation
-        if full_name and student_id and StudentProfile.objects.filter(full_name__iexact=full_name, student_id__iexact=student_id).exists():
-            errors.append("A student profile with this Full Name and Student ID pair already exists.")
+        # 6. Full Name and Username pair uniqueness validation
+        if full_name and username and StudentProfile.objects.filter(full_name__iexact=full_name, username__iexact=username).exists():
+            errors.append("A student profile with this Full Name and Username pair already exists.")
 
         if errors:
             return render(request, 'signup.html', {
                 'errors': errors,
                 'form_data': {
                     'fullName': full_name,
-                    'studentId': student_id,
-                    'age': age_raw,
                     'sex': sex,
+                    'age': age_raw,
+                    'username': username,
                     'email': email,
                     'securityQuestion': security_question,
                     'securityAnswer': security_answer,
@@ -99,17 +97,17 @@ def signup(request):
         except ValueError:
             age = None
 
-        # Create Django User (username=student_id) & StudentProfile
+        # Create Django User (username=username) & StudentProfile
         try:
             user = User.objects.create_user(
-                username=student_id,
+                username=username,
                 email=email,
                 password=password,
                 first_name=full_name
             )
             StudentProfile.objects.create(
                 user=user,
-                student_id=student_id,
+                username=username,
                 full_name=full_name,
                 age=age,
                 sex=sex,
@@ -126,9 +124,9 @@ def signup(request):
                 'errors': errors,
                 'form_data': {
                     'fullName': full_name,
-                    'studentId': student_id,
-                    'age': age_raw,
                     'sex': sex,
+                    'age': age_raw,
+                    'username': username,
                     'email': email,
                     'securityQuestion': security_question,
                     'securityAnswer': security_answer,
@@ -155,12 +153,12 @@ def signin(request):
 
         if not login_id or not password:
             return render(request, 'signin.html', {
-                'error': 'Please provide your Username, Student ID, or Email and password.',
+                'error': 'Please provide your Username or Email and password.',
                 'login_id': login_id,
                 'success': success,
             })
 
-        # Find user by username (student_id / admin username) or email
+        # Find user by username or email
         user_obj = None
         if User.objects.filter(username__iexact=login_id).exists():
             user_obj = User.objects.get(username__iexact=login_id)
@@ -201,9 +199,9 @@ def signin(request):
                     error_msg = 'Your account has been locked due to 5 failed login attempts. Please contact the administrator.'
                     is_locked = True
                 else:
-                    error_msg = 'Invalid Username/Student ID/Email address or password.'
+                    error_msg = 'Invalid Username/Email address or password.'
             else:
-                error_msg = 'Invalid Username/Student ID/Email address or password.'
+                error_msg = 'Invalid Username/Email address or password.'
 
             return render(request, 'signin.html', {
                 'error': error_msg,
@@ -230,27 +228,34 @@ def forgot_password(request):
         action_step = request.POST.get('step', '1')
 
         if action_step == '1':
-            student_id = request.POST.get('studentId', '').strip()
+            login_id = request.POST.get('loginId', request.POST.get('username', request.POST.get('login_id', ''))).strip()
             security_question = request.POST.get('securityQuestion', '').strip()
             security_answer = request.POST.get('securityAnswer', '').strip()
 
             form_data = {
-                'studentId': student_id,
+                'loginId': login_id,
                 'securityQuestion': security_question,
                 'securityAnswer': security_answer,
             }
 
-            if not student_id:
-                error = "Learner's Reference Number (LRN) is required."
-            elif not student_id.isdigit() or len(student_id) != 12:
-                error = "Learner's Reference Number (LRN) must be exactly a 12-digit number."
+            if not login_id:
+                error = "Please enter your Username or Email."
             elif not security_question:
                 error = "Please select your security question."
             elif not security_answer:
                 error = "Security answer is required."
             else:
-                try:
-                    profile = StudentProfile.objects.get(student_id__iexact=student_id)
+                profile = None
+                if User.objects.filter(username__iexact=login_id).exists():
+                    user_obj = User.objects.get(username__iexact=login_id)
+                    profile = getattr(user_obj, 'student_profile', None)
+                elif User.objects.filter(email__iexact=login_id).exclude(email='').exists():
+                    user_obj = User.objects.filter(email__iexact=login_id).exclude(email='').first()
+                    profile = getattr(user_obj, 'student_profile', None)
+                elif StudentProfile.objects.filter(username__iexact=login_id).exists():
+                    profile = StudentProfile.objects.filter(username__iexact=login_id).first()
+
+                if profile:
                     if profile.user and not profile.user.is_active:
                         error = "Your account has been locked due to multiple failed attempts. Please contact the administrator."
                         is_locked = True
@@ -258,13 +263,14 @@ def forgot_password(request):
                         profile.security_answer and
                         profile.security_answer.strip().lower() == security_answer.strip().lower()):
                         # Verification successful! Advance to Step 2.
-                        request.session['reset_student_id'] = profile.student_id
+                        request.session['reset_user_id'] = profile.user.id
+                        request.session['reset_username'] = profile.username or profile.user.username
                         step = 2
                     else:
                         ActivityLog.objects.create(
                             user=profile.user,
                             action='FAILED_PASSWORD_RESET',
-                            details=f"Failed password reset verification for LRN '{student_id}' (security answer or question mismatch)."
+                            details=f"Failed password reset verification for user '{login_id}' (security answer or question mismatch)."
                         )
                         locked = check_and_lock_account(profile.user, 'FAILED_PASSWORD_RESET')
                         if locked or (profile.user and not profile.user.is_active):
@@ -272,17 +278,17 @@ def forgot_password(request):
                             is_locked = True
                         else:
                             error = "The security question or answer does not match our records."
-                except StudentProfile.DoesNotExist:
-                    error = "No student account found with the provided LRN."
+                else:
+                    error = "No student account found with the provided Username or Email."
                     ActivityLog.objects.create(
                         user=None,
                         action='FAILED_PASSWORD_RESET',
-                        details=f"Failed password reset attempt for non-existent LRN: '{student_id}'."
+                        details=f"Failed password reset attempt for non-existent user: '{login_id}'."
                     )
 
         elif action_step == '2':
-            reset_student_id = request.session.get('reset_student_id')
-            if not reset_student_id:
+            reset_user_id = request.session.get('reset_user_id')
+            if not reset_user_id:
                 error = "Session expired or invalid verification state. Please verify your details again."
                 step = 1
             else:
@@ -300,16 +306,17 @@ def forgot_password(request):
                     step = 2
                 else:
                     try:
-                        profile = StudentProfile.objects.get(student_id=reset_student_id)
-                        user = profile.user
+                        user = User.objects.get(id=reset_user_id)
                         user.set_password(password)
                         user.save()
 
-                        if 'reset_student_id' in request.session:
-                            del request.session['reset_student_id']
+                        if 'reset_user_id' in request.session:
+                            del request.session['reset_user_id']
+                        if 'reset_username' in request.session:
+                            del request.session['reset_username']
 
                         return redirect('/signin/?reset=success')
-                    except (StudentProfile.DoesNotExist, User.DoesNotExist):
+                    except User.DoesNotExist:
                         error = "User account not found. Please try again."
                         step = 1
 
@@ -318,7 +325,7 @@ def forgot_password(request):
         'is_locked': is_locked,
         'step': step,
         'form_data': form_data,
-        'student_id': request.session.get('reset_student_id', '') if step == 2 else ''
+        'username': request.session.get('reset_username', '') if step == 2 else ''
     })
 
 
@@ -371,7 +378,7 @@ def retake_assessment(request):
         ActivityLog.objects.create(
             user=request.user,
             action='ASSESSMENT_RETAKEN',
-            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) reset their assessment for a fresh retake."
+            details=f"Student '{student_profile.full_name or request.user.username}' reset their assessment for a fresh retake."
         )
     return redirect('aptitude_ready')
 
@@ -405,7 +412,7 @@ def assess_aptitude(request):
         ActivityLog.objects.create(
             user=request.user,
             action='ASSESSMENT_COMPLETED',
-            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) completed the Aptitude Assessment."
+            details=f"Student '{student_profile.full_name or request.user.username}' completed the Aptitude Assessment."
         )
         return redirect('preference_ready')
 
@@ -444,7 +451,7 @@ def assess_preference(request):
         ActivityLog.objects.create(
             user=request.user,
             action='ASSESSMENT_COMPLETED',
-            details=f"Student '{student_profile.full_name or request.user.username}' (LRN: {student_profile.student_id or 'N/A'}) completed the Interest Preference Assessment."
+            details=f"Student '{student_profile.full_name or request.user.username}' completed the Interest Preference Assessment."
         )
         return redirect('loading')
 

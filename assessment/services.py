@@ -9,6 +9,8 @@ class OnetWebService:
     def __init__(self, api_key=None):
         if api_key is None:
             api_key = getattr(settings, 'ONET_API_KEY', '')
+        if isinstance(api_key, str):
+            api_key = api_key.strip('`"\' ')
         self._headers = {
             'User-Agent': 'python-OnetWebService/2.00 (bot)',
             'X-API-Key': api_key,
@@ -86,18 +88,20 @@ def sync_interest_questions():
             text = str(q.get('text', '')).strip()
 
             if text and index is not None:
-                # Check for existence using riasec_area and question_text combination
+                # Check for existence using item_number
                 obj, created = InterestQuestion.objects.get_or_create(
                     riasec_area=riasec_area,
                     question_text=text,
                     defaults={
-                        'item_number': index,
+                        'riasec_area': riasec_area,
+                        'question_text': text,
                         'status': True
                     }
                 )
-                if not created and obj.item_number != index:
-                    obj.item_number = index
-                    obj.save(update_fields=['item_number'])
+                if not created and (obj.riasec_area != riasec_area or obj.question_text != text):
+                    obj.riasec_area = riasec_area
+                    obj.question_text = text
+                    obj.save(update_fields=['riasec_area', 'question_text'])
 
     return InterestQuestion.objects.filter(status=True).order_by('item_number')
 
@@ -105,15 +109,16 @@ def sync_interest_questions():
 def get_riasec_results(student_profile):
     """
     Fetches RIASEC scores by sending student interest response ratings (item 1-60)
-    to O*NET API mnm/interestprofiler/results?answers=[answerString].
+    to O*NET API mnm/interestprofiler/results?answers=[answerString], with local fallback.
     """
     from .models import StudentInterestResponse
     from customization.models import InterestQuestion
 
     all_questions = InterestQuestion.objects.filter(status=True).order_by('item_number')
+    responses_qs = StudentInterestResponse.objects.filter(student=student_profile).select_related('question')
     existing_responses = {
         resp.question.item_number: resp.rating
-        for resp in StudentInterestResponse.objects.filter(student=student_profile).select_related('question')
+        for resp in responses_qs
     }
 
     # Build 60-character answer string in question item_number order
@@ -158,7 +163,7 @@ def get_riasec_results(student_profile):
 
     scored_areas = []
 
-    if isinstance(api_response, dict):
+    if isinstance(api_response, dict) and 'error' not in api_response:
         # 1. Primary parsing from 'result' list of interest dictionaries
         if 'result' in api_response and isinstance(api_response['result'], list) and len(api_response['result']) > 0:
             for item in api_response.get('result', []):
@@ -183,6 +188,28 @@ def get_riasec_results(student_profile):
                         score_val = 0
                     riasec_dict[field_name] = score_val
                     scored_areas.append((code_map[code_key], score_val))
+
+    # If O*NET call failed or was unreachable, calculate standard O*NET RIASEC scores directly from responses
+    if not scored_areas:
+        raw_dimension_scores = {'R': 0, 'I': 0, 'A': 0, 'S': 0, 'E': 0, 'C': 0}
+        char_to_field = {
+            'R': 'r_score',
+            'I': 'i_score',
+            'A': 'a_score',
+            'S': 's_score',
+            'E': 'e_score',
+            'C': 'c_score',
+        }
+        for resp in responses_qs:
+            area_char = resp.question.riasec_area.upper() if resp.question and resp.question.riasec_area else 'R'
+            if area_char in raw_dimension_scores:
+                # O*NET scoring: 1 -> 0 pts, 2 -> 1 pt, 3 -> 2 pts, 4 -> 3 pts, 5 -> 4 pts (0-40 total per area)
+                rating_points = max(0, min(4, resp.rating - 1))
+                raw_dimension_scores[area_char] += rating_points
+
+        for char_key, score_val in raw_dimension_scores.items():
+            riasec_dict[char_to_field[char_key]] = score_val
+            scored_areas.append((char_key, score_val))
 
     if scored_areas:
         # Sort by score descending; tie-breaker: order in RIASEC
@@ -406,4 +433,4 @@ def calculate_and_save_assessment_results(student_profile):
     )
 
     return result_obj
-
+

@@ -14,7 +14,7 @@ class StudentProfile(models.Model):
         related_name='student_profile',
         verbose_name="User"
     )
-    student_id = models.CharField(max_length=64, blank=True, null=True, unique=True, verbose_name="Student ID")
+    username = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Username")
     full_name = models.CharField(max_length=128, blank=True, null=True, verbose_name="Full Name")
     age = models.PositiveIntegerField(blank=True, null=True, verbose_name="Age")
     sex = models.CharField(max_length=20, blank=True, null=True, verbose_name="Sex")
@@ -23,11 +23,11 @@ class StudentProfile(models.Model):
     last_date_taken = models.DateTimeField(blank=True, null=True, verbose_name="Last Date Taken")
 
     def __str__(self):
-        return f"Profile: {self.user.username} (ID: {self.student_id or 'None'})"
+        return f"Profile: {self.user.username} ({self.full_name or 'N/A'})"
 
     class Meta:
         verbose_name_plural = "Student Profiles"
-        unique_together = ('full_name', 'student_id')
+        unique_together = ('full_name', 'username')
 
 
 

@@ -63,8 +63,12 @@
             <div class="form-row">
                 <div class="form-group">
                     <div class="input-wrapper">
-                        <i class="fas fa-id-card input-icon"></i>
-                        <input type="text" id="studentId" name="studentId" placeholder="Learner's Reference Number (LRN)" value="{{ form_data.studentId|default:'' }}" pattern="\d{12}" maxlength="12" minlength="12" inputmode="numeric" title="Please enter a 12-digit LRN" required>
+                        <i class="fas fa-venus-mars input-icon"></i>
+                        <select id="sex" name="sex" required>
+                            <option value="" disabled {% if not form_data.sex %}selected{% endif %}>Select sex</option>
+                            <option value="Male" {% if form_data.sex == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if form_data.sex == 'Female' %}selected{% endif %}>Female</option>
+                        </select>
                     </div>
                 </div>
 
@@ -79,12 +83,8 @@
             <div class="form-row">
                 <div class="form-group">
                     <div class="input-wrapper">
-                        <i class="fas fa-venus-mars input-icon"></i>
-                        <select id="sex" name="sex" required>
-                            <option value="" disabled {% if not form_data.sex %}selected{% endif %}>Select sex</option>
-                            <option value="Male" {% if form_data.sex == 'Male' %}selected{% endif %}>Male</option>
-                            <option value="Female" {% if form_data.sex == 'Female' %}selected{% endif %}>Female</option>
-                        </select>
+                        <i class="fas fa-user-tag input-icon"></i>
+                        <input type="text" id="username" name="username" placeholder="Username" value="{{ form_data.username|default:'' }}" required>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
                 <p>By creating an account on EduPath, you agree to abide by these terms and conditions. If you do not agree, please do not use the system.</p>
 
                 <h4>2. Student Account Security</h4>
-                <p>You are responsible for maintaining the confidentiality of your account details, including your Student ID, LRN, password, and security answers.</p>
+                <p>You are responsible for maintaining the confidentiality of your account details, including your username, password, and security answers.</p>
 
                 <h4>3. Academic Advisory Purpose</h4>
                 <p>EduPath provides personalized course recommendations based on aptitude and interest assessments. Recommendations are advisory tools meant to support academic planning at Aklan State University.</p>
@@ -194,7 +194,7 @@
             </div>
             <div class="modal-body">
                 <h4>1. Information We Collect</h4>
-                <p>We collect essential student demographic details (Name, Student ID/LRN, Age, Sex, Email) and assessment responses submitted during aptitude tests.</p>
+                <p>We collect essential student demographic details (Name, Username, Age, Sex, Email) and assessment responses submitted during aptitude tests.</p>
 
                 <h4>2. How We Use Your Data</h4>
                 <p>Your data is strictly used to process assessment results, calculate course suitability scores, and deliver personalized academic recommendations.</p>

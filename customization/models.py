@@ -280,7 +280,7 @@ def log_user_login_failed(sender, credentials, request, **kwargs):
     ActivityLog.objects.create(
         user=user_obj,
         action='FAILED_LOGIN',
-        details=f"Failed login attempt using Username/Email/LRN identifier: '{login_id}'"
+        details=f"Failed login attempt using Username/Email identifier: '{login_id}'"
     )
 
     if user_obj:

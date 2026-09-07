@@ -19,8 +19,11 @@ from django.urls import path, include
 from assessment import views
 
 admin.site.login = views.signin
+admin.site.logout = views.signout
 
 urlpatterns = [
+    path('admin/logout/', views.signout, name='admin_logout'),
     path('admin/', admin.site.urls),
     path('', include('assessment.urls')),
 ]
+
