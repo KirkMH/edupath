@@ -1,4 +1,4 @@
-# pyrefly: ignore [missing-import]
+import random
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -375,6 +375,11 @@ def retake_assessment(request):
         StudentAptitudeResponse.objects.filter(student=student_profile).delete()
         StudentInterestResponse.objects.filter(student=student_profile).delete()
         AssessmentResult.objects.filter(student=student_profile).delete()
+        
+        # Reset session randomized question order caches so next attempt gets fresh permutations
+        request.session.pop('aptitude_shuffled_ids', None)
+        request.session.pop('preference_shuffled_ids', None)
+
         ActivityLog.objects.create(
             user=request.user,
             action='ASSESSMENT_RETAKEN',
@@ -392,7 +397,21 @@ def aptitude_ready(request):
 @login_required(login_url='signin')
 def assess_aptitude(request):
     student_profile = request.user.student_profile
-    questions = AptitudeQuestion.objects.filter(status=True).order_by('question_id')
+    active_questions = list(AptitudeQuestion.objects.filter(status=True))
+
+    # Maintain stable randomized question order in session for this assessment attempt
+    shuffled_ids = request.session.get('aptitude_shuffled_ids')
+    active_ids = {q.question_id for q in active_questions}
+
+    if not shuffled_ids or set(shuffled_ids) != active_ids:
+        ids_list = [q.question_id for q in active_questions]
+        random.shuffle(ids_list)
+        shuffled_ids = ids_list
+        request.session['aptitude_shuffled_ids'] = shuffled_ids
+
+    # Order questions according to shuffled_ids
+    questions_map = {q.question_id: q for q in active_questions}
+    questions = [questions_map[qid] for qid in shuffled_ids if qid in questions_map]
 
     if request.method == 'POST':
         for question in questions:
@@ -419,9 +438,12 @@ def assess_aptitude(request):
     existing_responses = StudentAptitudeResponse.objects.filter(student=student_profile)
     user_answers = {resp.question_id: resp.selected_answer for resp in existing_responses}
 
+    import json
     return render(request, 'assessment/aptitude-assess.html', {
         'questions': questions,
         'user_answers': user_answers,
+        'user_answers_json': json.dumps(user_answers),
+        'total_questions': len(questions),
     })
 
 
@@ -433,7 +455,21 @@ def preference_ready(request):
 @login_required(login_url='signin')
 def assess_preference(request):
     student_profile = request.user.student_profile
-    questions = sync_interest_questions()
+    all_questions = list(sync_interest_questions())
+
+    # Maintain stable randomized question order in session for this assessment attempt
+    shuffled_ids = request.session.get('preference_shuffled_ids')
+    active_ids = {q.question_id for q in all_questions}
+
+    if not shuffled_ids or set(shuffled_ids) != active_ids:
+        ids_list = [q.question_id for q in all_questions]
+        random.shuffle(ids_list)
+        shuffled_ids = ids_list
+        request.session['preference_shuffled_ids'] = shuffled_ids
+
+    # Order questions according to shuffled_ids
+    questions_map = {q.question_id: q for q in all_questions}
+    questions = [questions_map[qid] for qid in shuffled_ids if qid in questions_map]
 
     if request.method == 'POST':
         for question in questions:

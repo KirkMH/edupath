@@ -212,6 +212,7 @@ class SignUpAndLoginTests(TestCase):
         response = self.client.get('/admin/login/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Sign in to your account")
+        self.assertContains(response, "Sign in to your account")
 
     def test_aptitude_assessment_flow(self):
         from customization.models import AptitudeQuestion
