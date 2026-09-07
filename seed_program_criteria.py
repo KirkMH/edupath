@@ -79,9 +79,26 @@ PROGRAM_CRITERIA_MAP = {
 
 def sync_program_criteria():
     print("Syncing program criteria weights and minimum levels...")
+    from customization.models import DEFAULT_DIMENSIONS
+
+    # Clean up any removed dimensions from criteria
+    ProgramCriteria.objects.exclude(dimension_name__in=DEFAULT_DIMENSIONS).delete()
+
     for abbrev, criteria_dict in PROGRAM_CRITERIA_MAP.items():
         try:
             program = Program.objects.get(abbreviation__iexact=abbrev)
+
+            # Ensure all default dimensions exist for the program
+            for dim in DEFAULT_DIMENSIONS:
+                ProgramCriteria.objects.get_or_create(
+                    program=program,
+                    dimension_name=dim,
+                    defaults={
+                        'weight': 0.00,
+                        'minimum_level': 'Not Applicable'
+                    }
+                )
+
             for dim_name, (weight, min_lvl) in criteria_dict.items():
                 ProgramCriteria.objects.update_or_create(
                     program=program,

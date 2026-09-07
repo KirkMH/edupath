@@ -68,8 +68,9 @@ class ProgramCriteriaInline(admin.TabularInline):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('abbreviation', 'program_name', 'created_at')
+    list_display = ('abbreviation', 'program_name', 'min_gwa', 'created_at')
     search_fields = ('program_name', 'abbreviation')
+    fields = ('program_name', 'abbreviation', 'description', 'min_gwa')
     inlines = [ProgramCriteriaInline]
 
     def get_formsets_with_inlines(self, request, obj=None):

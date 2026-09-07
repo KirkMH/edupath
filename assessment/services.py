@@ -90,9 +90,9 @@ def sync_interest_questions():
             if text and index is not None:
                 # Check for existence using item_number
                 obj, created = InterestQuestion.objects.get_or_create(
-                    riasec_area=riasec_area,
-                    question_text=text,
+                    item_number=int(index),
                     defaults={
+                        'item_number': int(index),
                         'riasec_area': riasec_area,
                         'question_text': text,
                         'status': True
@@ -304,10 +304,13 @@ def calculate_aptitude_dimension_scores(student_profile):
 
 def calculate_program_recommendations(student_profile, aptitude_scores, riasec_scores):
     """
-    Evaluates all Programs using ProgramCriteria weights, threshold evaluation (0.5 penalty if < minimum),
+    Evaluates all Programs using Program.min_gwa (hard disqualification if student GWA < program min_gwa),
+    ProgramCriteria weights (with threshold penalty multiplier if below minimum_level),
     and ScoreInterpretation model for overall alignment level determination.
     """
     from customization.models import Program, ProgramCriteria
+
+    student_gwa = float(getattr(student_profile, 'gwa', 0.0) or 0.0)
 
     # Map normalized scores (0 - 100%) across all 12 dimensions
     dim_to_student_score = {
@@ -336,6 +339,11 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
     program_rankings = []
 
     for prog in programs:
+        # Minimum GWA Hard Disqualification Gate:
+        if prog.min_gwa is not None and float(prog.min_gwa) > 0:
+            if student_gwa < float(prog.min_gwa):
+                continue  # Disqualified: student GWA falls below the program's required minimum GWA
+
         criteria = ProgramCriteria.objects.filter(program=prog)
         total_score = 0.0
         total_weight = 0.0
@@ -382,10 +390,15 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
     # Overall Alignment Level: determined by passing top_score through ScoreInterpretation model tiers
     alignment_level = lookup_score_interpretation(top_score)
 
-    explanation = (
-        f"Based on your cognitive aptitude assessment and O*NET RIASEC interest profile ({riasec_scores.get('riasec_code', '')}), "
-        f"your profile shows {alignment_level.lower()} alignment with {top_prog.program_name if top_prog else 'your recommended degree program'}."
-    )
+    if top_prog:
+        explanation = (
+            f"Based on your cognitive aptitude assessment and O*NET RIASEC interest profile ({riasec_scores.get('riasec_code', '')}), "
+            f"your profile shows {alignment_level.lower()} alignment with {top_prog.program_name}."
+        )
+    else:
+        explanation = (
+            f"Based on your assessment results, no academic programs currently match your criteria requirements."
+        )
 
     return {
         'top_recommended_program': top_prog,

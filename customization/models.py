@@ -25,6 +25,14 @@ class Program(models.Model):
     program_name = models.CharField(max_length=255)
     abbreviation = models.CharField(max_length=30, unique=True)
     description = models.TextField()
+    min_gwa = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Minimum GWA Cutoff",
+        help_text="Optional minimum GWA required for admission/recommendation (e.g., 85.00). Students with GWA below this value are disqualified."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -2,18 +2,20 @@
 
 This document outlines the recommended scoring weights and minimum requirement levels for the academic degree programs evaluated by the **EduPath Decision Support System**. 
 
-The evaluation framework balances two primary components across **12 Dimensions**:
+The evaluation framework evaluates student profiles across **12 Core Evaluation Dimensions** combined with an optional **Program Minimum GWA Cutoff**:
 1. **Aptitude Dimensions (6 Cognitive Domains)**: Numerical Reasoning, Logical Reasoning, Problem-Solving, Spatial Ability, Technical/Mechanical Reasoning, Verbal/Communication Ability.
 2. **Preference Dimensions (6 O*NET RIASEC Interest Areas)**: Realistic (R), Investigative (I), Artistic (A), Social (S), Enterprising (E), Conventional (C).
+3. **Academic Prerequisite (Program `min_gwa`)**: Optional minimum General Weighted Average configured directly on each `Program`. If a student's GWA falls below a program's `min_gwa`, they are strictly disqualified from receiving that program as a recommendation.
 
 ---
 
 ## 📊 Overview of Evaluation Framework
 
-Each program is assigned a total weight of **1.00 (100%)** distributed across the relevant dimensions, coupled with a minimum threshold level (`Very High`, `High`, `Moderate`, `Low`, `Very Low`, or `Not Applicable`).
+Each program defines scoring weights totaling **1.00 (100%)** distributed across the 12 evaluation dimensions, coupled with minimum threshold levels (`Very High`, `High`, `Moderate`, `Low`, `Very Low`, or `Not Applicable`), plus an optional `min_gwa` cutoff on the Program:
 
-- **Aptitude Component (70% - 75% Total Weight)**: Evaluates student cognitive capabilities and problem-solving skills necessary to succeed academically.
-- **Preference Component (25% - 30% Total Weight)**: Evaluates student interest alignment based on Holland's RIASEC theory to ensure long-term career satisfaction and persistence.
+- **Minimum GWA Cutoff (`Program.min_gwa`)**: Optional numeric cutoff (e.g., `85.00`). Students with a GWA lower than this value are strictly disqualified and cannot be recommended for the program.
+- **Aptitude Component (70% - 75% Total Weight)**: Evaluates cognitive capabilities and problem-solving skills necessary for academic success.
+- **Preference Component (25% - 30% Total Weight)**: Evaluates student interest alignment based on Holland's RIASEC theory.
 
 ---
 

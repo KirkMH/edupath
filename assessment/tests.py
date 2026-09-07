@@ -35,6 +35,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'janedoe',
             'age': '21',
             'sex': 'Female',
+            'gwa': '88.50',
             'email': 'jane@example.com',
             'password': 'SecurePassword123!',
             'confirmPassword': 'SecurePassword123!',
@@ -45,7 +46,9 @@ class SignUpAndLoginTests(TestCase):
         response = self.client.post(self.signup_url, data)
         self.assertRedirects(response, self.dashboard_url)
         self.assertTrue(User.objects.filter(username='janedoe', email='jane@example.com').exists())
-        self.assertTrue(StudentProfile.objects.filter(username='janedoe', full_name='Jane Doe').exists())
+        profile = StudentProfile.objects.filter(username='janedoe', full_name='Jane Doe').first()
+        self.assertIsNotNone(profile)
+        self.assertEqual(float(profile.gwa), 88.50)
 
     def test_successful_signup_without_email(self):
         data = {
@@ -53,6 +56,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'noemailstudent',
             'age': '19',
             'sex': 'Male',
+            'gwa': '92.00',
             'email': '',  # Blank email
             'password': 'SecurePassword123!',
             'confirmPassword': 'SecurePassword123!',
@@ -62,7 +66,33 @@ class SignUpAndLoginTests(TestCase):
         }
         response = self.client.post(self.signup_url, data)
         self.assertRedirects(response, self.dashboard_url)
-        self.assertTrue(StudentProfile.objects.filter(username='noemailstudent', full_name='No Email Student').exists())
+        profile = StudentProfile.objects.filter(username='noemailstudent', full_name='No Email Student').first()
+        self.assertIsNotNone(profile)
+        self.assertEqual(float(profile.gwa), 92.00)
+
+    def test_signup_invalid_gwa(self):
+        data = {
+            'fullName': 'Invalid GWA Student',
+            'username': 'invalidgwa',
+            'age': '19',
+            'sex': 'Male',
+            'gwa': '45.00',  # below 50
+            'email': '',
+            'password': 'SecurePassword123!',
+            'confirmPassword': 'SecurePassword123!',
+            'securityQuestion': 'What was the name of your first pet?',
+            'securityAnswer': 'Fluffy',
+            'terms': 'on'
+        }
+        response = self.client.post(self.signup_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "General Weighted Average (GWA) must be between 50.00 and 100.00.")
+
+        # Non-numeric GWA test
+        data['gwa'] = 'abc'
+        response2 = self.client.post(self.signup_url, data)
+        self.assertEqual(response2.status_code, 200)
+        self.assertContains(response2, "Please enter a valid numeric General Weighted Average (GWA).")
 
     def test_signin_with_username(self):
         data = {
@@ -110,6 +140,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'johnsmith',
             'age': '22',
             'sex': 'Male',
+            'gwa': '85.00',
             'email': 'john@example.com',
             'password': 'Password123!',
             'confirmPassword': 'DifferentPassword!',
@@ -127,6 +158,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'johnsmith',
             'age': '22',
             'sex': 'Male',
+            'gwa': '85.00',
             'email': 'john@example.com',
             'password': 'Password123!',
             'confirmPassword': 'Password123!',
@@ -143,6 +175,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'newuser123',
             'age': '20',
             'sex': 'Male',
+            'gwa': '85.00',
             'email': 'existing@example.com',
             'password': 'Password123!',
             'confirmPassword': 'Password123!',
@@ -160,6 +193,7 @@ class SignUpAndLoginTests(TestCase):
             'username': 'student1',
             'age': '20',
             'sex': 'Female',
+            'gwa': '85.00',
             'email': 'newstudent@example.com',
             'password': 'Password123!',
             'confirmPassword': 'Password123!',
@@ -460,6 +494,81 @@ class RiasecAndAssessmentResultTests(TestCase):
         self.assertEqual(result_res.status_code, 200)
         self.assertContains(result_res, "Realistic")
         self.assertContains(result_res, "BSCpE")
+
+    def test_gwa_exact_numeric_cutoff_disqualification(self):
+        """
+        Verify that a program with min_gwa is strictly disqualified
+        when the student's GWA falls below that exact number.
+        """
+        from assessment.models import StudentInterestResponse, StudentAptitudeResponse
+        from assessment.services import calculate_program_recommendations, calculate_aptitude_dimension_scores, get_riasec_results
+        from customization.models import Program, ProgramCriteria
+
+        # Student has GWA of 82.00
+        self.profile.gwa = 82.00
+        self.profile.save()
+
+        # Set BSCpE GWA cutoff to 85.00 directly on Program model
+        self.prog_eng.min_gwa = 85.00
+        self.prog_eng.save()
+
+        # Create another program without strict GWA cutoff
+        prog_it = Program.objects.create(
+            program_name="Bachelor of Science in Information Technology",
+            abbreviation="BSIT_TEST",
+            description="IT program.",
+            min_gwa=None
+        )
+        ProgramCriteria.objects.update_or_create(
+            program=prog_it,
+            dimension_name='Realistic',
+            defaults={'weight': 0.50, 'minimum_level': 'Not Applicable'}
+        )
+
+        # Answer all aptitude items correctly and high realistic interest
+        for q in self.apt_questions:
+            StudentAptitudeResponse.objects.create(student=self.profile, question=q, selected_answer='A', is_correct=True)
+        for q in self.questions:
+            StudentInterestResponse.objects.create(student=self.profile, question=q, rating=5)
+
+        apt_scores = calculate_aptitude_dimension_scores(self.profile)
+        riasec_scores = get_riasec_results(self.profile)
+        recs = calculate_program_recommendations(self.profile, apt_scores, riasec_scores)
+
+        # BSCpE should be DISQUALIFIED because 82.00 < 85.00
+        self.assertNotEqual(recs['top_recommended_program'], self.prog_eng)
+        self.assertNotEqual(recs['second_recommended_program'], self.prog_eng)
+        self.assertNotEqual(recs['third_recommended_program'], self.prog_eng)
+        self.assertEqual(recs['top_recommended_program'], prog_it)
+
+    def test_gwa_exact_numeric_cutoff_qualification(self):
+        """
+        Verify that a student meeting/exceeding the min_gwa cutoff is eligible
+        and recommended.
+        """
+        from assessment.models import StudentInterestResponse, StudentAptitudeResponse
+        from assessment.services import calculate_program_recommendations, calculate_aptitude_dimension_scores, get_riasec_results
+
+        # Student has GWA of 88.50
+        self.profile.gwa = 88.50
+        self.profile.save()
+
+        # Set BSCpE GWA cutoff to 85.00 directly on Program model
+        self.prog_eng.min_gwa = 85.00
+        self.prog_eng.save()
+
+        # Answer all aptitude items correctly and high realistic interest
+        for q in self.apt_questions:
+            StudentAptitudeResponse.objects.create(student=self.profile, question=q, selected_answer='A', is_correct=True)
+        for q in self.questions:
+            StudentInterestResponse.objects.create(student=self.profile, question=q, rating=5)
+
+        apt_scores = calculate_aptitude_dimension_scores(self.profile)
+        riasec_scores = get_riasec_results(self.profile)
+        recs = calculate_program_recommendations(self.profile, apt_scores, riasec_scores)
+
+        # BSCpE should QUALIFY because 88.50 >= 85.00
+        self.assertEqual(recs['top_recommended_program'], self.prog_eng)
 
 
 

@@ -31,6 +31,7 @@ def signup(request):
         full_name = request.POST.get('fullName', '').strip()
         sex = request.POST.get('sex', '').strip()
         age_raw = request.POST.get('age', '').strip()
+        gwa_raw = request.POST.get('gwa', '').strip()
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
@@ -48,6 +49,8 @@ def signup(request):
             errors.append("Sex is required.")
         if not age_raw:
             errors.append("Age is required.")
+        if not gwa_raw:
+            errors.append("General Weighted Average (GWA) is required.")
         if not username:
             errors.append("Username is required.")
         if not password:
@@ -56,6 +59,16 @@ def signup(request):
             errors.append("Security question is required.")
         if not security_answer:
             errors.append("Security answer is required.")
+
+        # Validate GWA numeric bounds
+        gwa = None
+        if gwa_raw:
+            try:
+                gwa = float(gwa_raw)
+                if gwa < 50.0 or gwa > 100.0:
+                    errors.append("General Weighted Average (GWA) must be between 50.00 and 100.00.")
+            except ValueError:
+                errors.append("Please enter a valid numeric General Weighted Average (GWA).")
 
         # 2. Checkbox validation
         if not terms:
@@ -84,6 +97,7 @@ def signup(request):
                     'fullName': full_name,
                     'sex': sex,
                     'age': age_raw,
+                    'gwa': gwa_raw,
                     'username': username,
                     'email': email,
                     'securityQuestion': security_question,
@@ -111,6 +125,7 @@ def signup(request):
                 full_name=full_name,
                 age=age,
                 sex=sex,
+                gwa=gwa,
                 security_question=security_question,
                 security_answer=security_answer
             )
@@ -126,6 +141,7 @@ def signup(request):
                     'fullName': full_name,
                     'sex': sex,
                     'age': age_raw,
+                    'gwa': gwa_raw,
                     'username': username,
                     'email': email,
                     'securityQuestion': security_question,

@@ -18,12 +18,20 @@ class StudentProfile(models.Model):
     full_name = models.CharField(max_length=128, blank=True, null=True, verbose_name="Full Name")
     age = models.PositiveIntegerField(blank=True, null=True, verbose_name="Age")
     sex = models.CharField(max_length=20, blank=True, null=True, verbose_name="Sex")
+    gwa = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0.00), MaxValueValidator(100.00)],
+        verbose_name="General Weighted Average (GWA)"
+    )
     security_question = models.CharField(max_length=255, blank=True, null=True, verbose_name="Security Question")
     security_answer = models.CharField(max_length=255, blank=True, null=True, verbose_name="Security Answer")
     last_date_taken = models.DateTimeField(blank=True, null=True, verbose_name="Last Date Taken")
 
     def __str__(self):
-        return f"Profile: {self.user.username} ({self.full_name or 'N/A'})"
+        return f"Profile: {self.user.username} ({self.full_name or 'N/A'}, GWA: {self.gwa or 'N/A'})"
 
     class Meta:
         verbose_name_plural = "Student Profiles"
