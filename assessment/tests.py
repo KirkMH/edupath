@@ -571,4 +571,117 @@ class RiasecAndAssessmentResultTests(TestCase):
         self.assertEqual(recs['top_recommended_program'], self.prog_eng)
 
 
+class MajorModelAndRecommendationTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='majorstudent',
+            email='major@example.com',
+            password='Password123!'
+        )
+        self.profile = StudentProfile.objects.create(
+            user=self.user,
+            username='majorstudent',
+            full_name='Major Test Student',
+            age=20,
+            sex='Female',
+            gwa=88.00
+        )
+        from customization.models import Program, Major, MajorCriteria
+        self.program = Program.objects.create(
+            program_name="Bachelor of Science in Information Technology",
+            abbreviation="BSIT_MAJOR_TEST",
+            description="IT program with majors."
+        )
+
+        self.major1 = Major.objects.create(
+            program=self.program,
+            name="Software Engineering",
+            description="Software focus."
+        )
+        self.major2 = Major.objects.create(
+            program=self.program,
+            name="Networking & Hardware",
+            description="Hardware focus."
+        )
+
+        # Configure Criteria for major1: heavy Logical Reasoning
+        MajorCriteria.objects.update_or_create(
+            major=self.major1,
+            dimension_name='Logical Reasoning',
+            defaults={'weight': 0.60, 'minimum_level': 'High'}
+        )
+        MajorCriteria.objects.update_or_create(
+            major=self.major1,
+            dimension_name='Problem-Solving',
+            defaults={'weight': 0.40, 'minimum_level': 'Moderate'}
+        )
+
+        # Configure Criteria for major2: heavy Technical Reasoning
+        MajorCriteria.objects.update_or_create(
+            major=self.major2,
+            dimension_name='Technical/Mechanical Reasoning',
+            defaults={'weight': 0.70, 'minimum_level': 'High'}
+        )
+        MajorCriteria.objects.update_or_create(
+            major=self.major2,
+            dimension_name='Realistic',
+            defaults={'weight': 0.30, 'minimum_level': 'Moderate'}
+        )
+
+    def test_major_signals_create_default_criteria(self):
+        from customization.models import MajorCriteria, DEFAULT_DIMENSIONS
+        criteria_count = MajorCriteria.objects.filter(major=self.major1).count()
+        self.assertEqual(criteria_count, len(DEFAULT_DIMENSIONS))
+
+    def test_calculate_major_recommendations_ranking(self):
+        from assessment.services import calculate_major_recommendations
+
+        aptitude_scores = {
+            'numerical_score': 50,
+            'logical_score': 90,
+            'problem_solving_score': 85,
+            'spatial_score': 40,
+            'technical_score': 30,
+            'verbal_score': 50,
+        }
+        riasec_scores = {
+            'r_score': 10,
+            'i_score': 35,
+            'a_score': 20,
+            's_score': 15,
+            'e_score': 10,
+            'c_score': 15,
+            'riasec_code': 'I-A-S',
+        }
+
+        recs = calculate_major_recommendations(
+            student_profile=self.profile,
+            program=self.program,
+            aptitude_scores=aptitude_scores,
+            riasec_scores=riasec_scores
+        )
+
+        self.assertEqual(len(recs['top_majors']), 2)
+        # major1 should rank #1 because logical & problem-solving scores are high (90 and 85)
+        self.assertEqual(recs['top_majors'][0]['major'], self.major1)
+        self.assertEqual(recs['top_majors'][0]['rank'], 1)
+        self.assertGreater(recs['top_majors'][0]['match_score'], recs['top_majors'][1]['match_score'])
+
+    def test_major_recommendations_view_authenticated(self):
+        from assessment.services import calculate_and_save_assessment_results
+        self.client.login(username='majorstudent', password='Password123!')
+
+        # Create assessment result
+        calculate_and_save_assessment_results(self.profile)
+
+        url = reverse('major_recommendations', args=[self.program.program_id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'assessment/major_result.html')
+        self.assertContains(response, "Software Engineering")
+        self.assertContains(response, "Networking &amp; Hardware")
+
+
+
 

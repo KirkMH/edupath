@@ -588,6 +588,74 @@
     font-weight: 700;
 }
 
+/* Majors CTA Button */
+.btn-explore-majors {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 16px;
+    background: #15803d;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    border: 1px solid #166534;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.18);
+}
+
+.btn-explore-majors:hover {
+    background: #166534;
+    border-color: #14532d;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(21, 128, 61, 0.28);
+}
+
+.btn-explore-majors:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2);
+}
+
+.btn-explore-majors i {
+    font-size: 13.5px;
+    color: #86efac;
+    transition: transform 0.2s ease;
+}
+
+.btn-explore-majors:hover i {
+    transform: scale(1.1);
+}
+
+/* Secondary degree cards (cards 2 & 3) subtle variant */
+.degree-card:not(.featured-card) .btn-explore-majors {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1.5px solid #86efac;
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.06);
+}
+
+.degree-card:not(.featured-card) .btn-explore-majors:hover {
+    background: #15803d;
+    color: #ffffff;
+    border-color: #15803d;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.22);
+}
+
+.degree-card:not(.featured-card) .btn-explore-majors i {
+    color: #15803d;
+}
+
+.degree-card:not(.featured-card) .btn-explore-majors:hover i {
+    color: #ffffff;
+}
+
 /* Responsive */
 @media (max-width: 860px) {
     .results-grid {
@@ -604,3 +672,4 @@
         display: none;
     }
 }
+

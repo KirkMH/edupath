@@ -147,31 +147,98 @@ Each program defines scoring weights totaling **1.00 (100%)** distributed across
 
 ---
 
+### 7. Bachelor of Industrial Technology (BIndTech)
+*Focus: Hands-on technical training, trade skills, shop floor operations, equipment fabrication, and applied industrial innovations across diverse technology disciplines.*
+
+| Category | Dimension | Weight | Minimum Level | Rationale |
+| :--- | :--- | :---: | :---: | :--- |
+| **Aptitude** | Technical/Mechanical Reasoning | **0.25** | **High** | Core requirement for operating, diagnosing, and maintaining heavy machinery, electrical systems, and shop tools. |
+| **Aptitude** | Problem-Solving | **0.15** | **High** | Essential for shop floor troubleshooting, repair diagnostics, fabrication adjustments, and prototyping. |
+| **Aptitude** | Spatial Ability | **0.15** | **High** | Critical for interpreting technical drawings, blueprint schematics, and mechanical assemblies. |
+| **Aptitude** | Numerical Reasoning | **0.05** | **Moderate** | Needed for precision measurement, tolerance calculations, material estimations, and calibration. |
+| **Aptitude** | Logical Reasoning | **0.05** | **Moderate** | Important for diagnostic decision trees, technical safety protocols, and operational sequencing. |
+| **Aptitude** | Verbal/Communication Ability | **0.05** | **Moderate** | Useful for workshop safety briefings, technical logs, and maintenance reporting. |
+| **Preference** | Realistic (R) | **0.20** | **Very High** | Primary interest match; direct hands-on work with tools, industrial machinery, fabrication, and physical builds. |
+| **Preference** | Conventional (C) | **0.05** | **Moderate** | Adherence to technical specifications, safety codes, and maintenance records. |
+| **Preference** | Enterprising (E) | **0.05** | **Moderate** | Helpful for workshop supervision, industrial entrepreneurship, and trade leadership. |
+| **Preference** | Investigative (I) | **0.00** | *Not Applicable* | Secondary to practical applied technical execution. |
+| **Preference** | Artistic (A) | **0.00** | *Not Applicable* | Minor relevance to core industrial technical operations. |
+| **Preference** | Social (S) | **0.00** | *Not Applicable* | Secondary to technical machinery operation and trade execution. |
+| **Total** | | **1.00** | | |
+
+---
+
+### 8. Bachelor of Science in Information Systems (BSIS)
+*Focus: Integration of information technology solutions and business enterprise processes, emphasizing systems analysis, database design, enterprise resource planning, and IT project management.*
+
+| Category | Dimension | Weight | Minimum Level | Rationale |
+| :--- | :--- | :---: | :---: | :--- |
+| **Aptitude** | Logical Reasoning | **0.15** | **High** | Essential for workflow mapping, systems analysis, decision trees, and business process automation. |
+| **Aptitude** | Problem-Solving | **0.15** | **High** | Core skill for identifying operational bottlenecks and architecting technical enterprise solutions. |
+| **Aptitude** | Verbal/Communication Ability | **0.15** | **High** | Critical for requirement gathering, bridging business stakeholders and development teams, and user training. |
+| **Aptitude** | Numerical Reasoning | **0.10** | **Moderate** | Important for business analytics, financial cost-benefit modeling, and data analytics. |
+| **Aptitude** | Technical/Mechanical Reasoning | **0.10** | **Moderate** | Required for understanding database architecture, cloud infrastructure, and enterprise network design. |
+| **Aptitude** | Spatial Ability | **0.05** | **Low** | Useful for database schema ERD diagrams, workflow charts, and enterprise UI/UX mapping. |
+| **Preference** | Enterprising (E) | **0.10** | **High** | Direct alignment with IT project management, technology consulting, and business strategy. |
+| **Preference** | Conventional (C) | **0.10** | **High** | Strong alignment with structured databases, corporate compliance, and data governance. |
+| **Preference** | Investigative (I) | **0.10** | **High** | Interest in business intelligence research, system audits, and emerging IT enterprise trends. |
+| **Preference** | Realistic (R) | **0.00** | *Not Applicable* | Secondary to enterprise business system design. |
+| **Preference** | Artistic (A) | **0.00** | *Not Applicable* | Minor relevance outside general UI/UX considerations. |
+| **Preference** | Social (S) | **0.00** | *Not Applicable* | Secondary to technical and systems analysis duties. |
+| **Total** | | **1.00** | | |
+
+---
+
+### 9. Bachelor of Science in Entertainment and Multimedia Computing (BSEMC)
+*Focus: Concepts and technologies for creating interactive digital media, video game development, 2D/3D computer animation, digital visual effects, and multimedia systems.*
+
+| Category | Dimension | Weight | Minimum Level | Rationale |
+| :--- | :--- | :---: | :---: | :--- |
+| **Aptitude** | Spatial Ability | **0.20** | **High** | Crucial for 3D modeling, spatial scene composition, perspective rendering, and animation physics. |
+| **Aptitude** | Logical Reasoning | **0.15** | **High** | Essential for game programming, scripting logic, physics simulations, and engine architectures. |
+| **Aptitude** | Problem-Solving | **0.15** | **High** | Key for debugging game engines, performance optimization, rendering pipelines, and interactive mechanics. |
+| **Aptitude** | Numerical Reasoning | **0.10** | **Moderate** | Required for linear algebra, vector math, coordinate transformations, and computational geometry. |
+| **Aptitude** | Technical/Mechanical Reasoning | **0.05** | **Moderate** | Understanding graphics processing hardware, audiovisual recording rigs, and rendering hardware. |
+| **Aptitude** | Verbal/Communication Ability | **0.05** | **Moderate** | Important for game narrative design, creative pitching, and cross-functional studio collaboration. |
+| **Preference** | Artistic (A) | **0.15** | **Very High** | Primary interest driver; digital illustration, concept art, animation, character design, and audiovisual aesthetics. |
+| **Preference** | Investigative (I) | **0.10** | **High** | Interest in game mechanics research, procedural generation algorithms, and shader graphics programming. |
+| **Preference** | Realistic (R) | **0.05** | **Moderate** | Hands-on interaction with motion capture hardware, VR/AR headsets, audio controllers, and digital tablets. |
+| **Preference** | Social (S) | **0.00** | *Not Applicable* | Secondary to creative design and technical computing. |
+| **Preference** | Enterprising (E) | **0.00** | *Not Applicable* | Secondary to digital media asset production and programming. |
+| **Preference** | Conventional (C) | **0.00** | *Not Applicable* | Secondary to artistic creativity and software development. |
+| **Total** | | **1.00** | | |
+
+---
+
 ## 📈 Summary Comparison Matrix
 
-The table below summarizes the recommended weight distribution across all 6 programs and 12 evaluation dimensions:
+The table below summarizes the recommended weight distribution across all 9 programs and 12 evaluation dimensions:
 
-| Dimension | Category | BSCE | BS InfoTech | BSIT | BSHM | BTVTed | BSA |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Numerical Reasoning** | Aptitude | **0.20** | 0.10 | 0.10 | 0.10 | 0.05 | 0.10 |
-| **Logical Reasoning** | Aptitude | 0.10 | **0.20** | 0.05 | 0.10 | 0.05 | 0.10 |
-| **Problem-Solving** | Aptitude | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** |
-| **Spatial Ability** | Aptitude | **0.15** | 0.05 | 0.10 | 0.05 | 0.05 | **0.25** |
-| **Technical/Mechanical** | Aptitude | 0.10 | 0.10 | **0.25** | 0.05 | **0.15** | 0.05 |
-| **Verbal/Communication** | Aptitude | 0.05 | 0.10 | 0.05 | **0.25** | **0.25** | 0.05 |
-| **Realistic (R)** | Preference | 0.10 | 0.05 | **0.15** | 0.00 | 0.10 | 0.05 |
-| **Investigative (I)** | Preference | 0.10 | 0.10 | 0.00 | 0.00 | 0.00 | 0.05 |
-| **Artistic (A)** | Preference | 0.00 | 0.05 | 0.00 | 0.00 | 0.00 | **0.15** |
-| **Social (S)** | Preference | 0.00 | 0.00 | 0.00 | **0.15** | **0.15** | 0.00 |
-| **Enterprising (E)** | Preference | 0.00 | 0.00 | 0.05 | 0.10 | 0.00 | 0.00 |
-| **Conventional (C)** | Preference | 0.05 | 0.10 | 0.10 | 0.05 | 0.05 | 0.05 |
-| **Total Weight** | | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** |
+| Dimension | Category | BSCE | BS InfoTech | BSIT | BSHM | BTVTed | BSA | BIndTech | BSIS | BSEMC |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Numerical Reasoning** | Aptitude | **0.20** | 0.10 | 0.10 | 0.10 | 0.05 | 0.10 | 0.05 | 0.10 | 0.10 |
+| **Logical Reasoning** | Aptitude | 0.10 | **0.20** | 0.05 | 0.10 | 0.05 | 0.10 | 0.05 | **0.15** | **0.15** |
+| **Problem-Solving** | Aptitude | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** | **0.15** |
+| **Spatial Ability** | Aptitude | **0.15** | 0.05 | 0.10 | 0.05 | 0.05 | **0.25** | **0.15** | 0.05 | **0.20** |
+| **Technical/Mechanical** | Aptitude | 0.10 | 0.10 | **0.25** | 0.05 | **0.15** | 0.05 | **0.25** | 0.10 | 0.05 |
+| **Verbal/Communication** | Aptitude | 0.05 | 0.10 | 0.05 | **0.25** | **0.25** | 0.05 | 0.05 | **0.15** | 0.05 |
+| **Realistic (R)** | Preference | 0.10 | 0.05 | **0.15** | 0.00 | 0.10 | 0.05 | **0.20** | 0.00 | 0.05 |
+| **Investigative (I)** | Preference | 0.10 | 0.10 | 0.00 | 0.00 | 0.00 | 0.05 | 0.00 | **0.10** | **0.10** |
+| **Artistic (A)** | Preference | 0.00 | 0.05 | 0.00 | 0.00 | 0.00 | **0.15** | 0.00 | 0.00 | **0.15** |
+| **Social (S)** | Preference | 0.00 | 0.00 | 0.00 | **0.15** | **0.15** | 0.00 | 0.00 | 0.00 | 0.00 |
+| **Enterprising (E)** | Preference | 0.00 | 0.00 | 0.05 | 0.10 | 0.00 | 0.00 | 0.05 | **0.10** | 0.00 |
+| **Conventional (C)** | Preference | 0.05 | 0.10 | 0.10 | 0.05 | 0.05 | 0.05 | 0.05 | **0.10** | 0.00 |
+| **Total Weight** | | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** | **1.00** |
 
 ---
 
 ## 🛠️ Automated Database Seeding Script
 
-To quickly apply these recommended criteria to your Django database, run the seed script below or execute python manage.py shell with the script logic:
+To quickly apply these recommended criteria to your Django database, run the seed script:
+
+```bash
+python seed_program_criteria.py
+```
 
 ```python
 # seed_program_criteria.py
@@ -251,6 +318,39 @@ PROGRAM_CRITERIA_MAP = {
         "Realistic": (0.05, "Moderate"),
         "Investigative": (0.05, "Moderate"),
         "Conventional": (0.05, "Moderate"),
+    },
+    "BIndTech": {
+        "Technical/Mechanical Reasoning": (0.25, "High"),
+        "Problem-Solving": (0.15, "High"),
+        "Spatial Ability": (0.15, "High"),
+        "Numerical Reasoning": (0.05, "Moderate"),
+        "Logical Reasoning": (0.05, "Moderate"),
+        "Verbal/Communication Ability": (0.05, "Moderate"),
+        "Realistic": (0.20, "Very High"),
+        "Conventional": (0.05, "Moderate"),
+        "Enterprising": (0.05, "Moderate"),
+    },
+    "BSIS": {
+        "Logical Reasoning": (0.15, "High"),
+        "Problem-Solving": (0.15, "High"),
+        "Verbal/Communication Ability": (0.15, "High"),
+        "Numerical Reasoning": (0.10, "Moderate"),
+        "Technical/Mechanical Reasoning": (0.10, "Moderate"),
+        "Spatial Ability": (0.05, "Low"),
+        "Enterprising": (0.10, "High"),
+        "Conventional": (0.10, "High"),
+        "Investigative": (0.10, "High"),
+    },
+    "BSEMC": {
+        "Spatial Ability": (0.20, "High"),
+        "Logical Reasoning": (0.15, "High"),
+        "Problem-Solving": (0.15, "High"),
+        "Numerical Reasoning": (0.10, "Moderate"),
+        "Technical/Mechanical Reasoning": (0.05, "Moderate"),
+        "Verbal/Communication Ability": (0.05, "Moderate"),
+        "Artistic": (0.15, "Very High"),
+        "Investigative": (0.10, "High"),
+        "Realistic": (0.05, "Moderate"),
     },
 }
 

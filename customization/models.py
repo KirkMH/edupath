@@ -143,6 +143,69 @@ class ProgramCriteria(models.Model):
         verbose_name_plural = "Program Criteria"
 
 
+class Major(models.Model):
+    """
+    Academic specialization / major offered under a degree program.
+    """
+    major_id = models.AutoField(primary_key=True)
+    program = models.ForeignKey(
+        'customization.Program',
+        on_delete=models.CASCADE,
+        related_name='majors',
+        verbose_name="Program"
+    )
+    name = models.CharField(max_length=255, verbose_name="Major Name")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.program.abbreviation} - {self.name}"
+
+    class Meta:
+        verbose_name = "Major"
+        verbose_name_plural = "Majors"
+        ordering = ['program', 'name']
+
+
+class MajorCriteria(models.Model):
+    """
+    Configurable scoring weights and minimum thresholds per major and dimension.
+    """
+    MINIMUM_LEVEL_CHOICES = [
+        ('Very High', 'Very High'),
+        ('High', 'High'),
+        ('Moderate', 'Moderate'),
+        ('Low', 'Low'),
+        ('Very Low', 'Very Low'),
+        ('Not Applicable', 'Not Applicable'),
+    ]
+
+    criterion_id = models.AutoField(primary_key=True, verbose_name="Criterion ID")
+    major = models.ForeignKey(
+        'customization.Major',
+        on_delete=models.CASCADE,
+        related_name='criteria',
+        verbose_name="Major"
+    )
+    dimension_name = models.CharField(max_length=100, verbose_name="Dimension Name")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, verbose_name="Weight")
+    minimum_level = models.CharField(
+        max_length=20,
+        choices=MINIMUM_LEVEL_CHOICES,
+        default='Not Applicable',
+        verbose_name="Minimum Level"
+    )
+
+    def __str__(self):
+        return f"{self.major.name} Criteria - {self.dimension_name} (weight={self.weight})"
+
+    class Meta:
+        verbose_name = "Major Criterion"
+        verbose_name_plural = "Major Criteria"
+
+
+
 
 
 
@@ -306,5 +369,19 @@ def create_default_program_criteria(sender, instance, created, **kwargs):
                 'minimum_level': 'Not Applicable'
             }
         )
+
+
+@receiver(post_save, sender=Major)
+def create_default_major_criteria(sender, instance, created, **kwargs):
+    for dim in DEFAULT_DIMENSIONS:
+        MajorCriteria.objects.get_or_create(
+            major=instance,
+            dimension_name=dim,
+            defaults={
+                'weight': 0.00,
+                'minimum_level': 'Not Applicable'
+            }
+        )
+
 
 

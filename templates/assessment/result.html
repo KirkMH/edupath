@@ -64,6 +64,11 @@
                 </div>
                 <div class="match-track" style="height: 8px;"><div class="match-fill-blue" style="width: 90%;"></div></div>
               </div>
+              {% if top_has_majors %}
+              <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' result.top_recommended_program.program_id %}'">
+                <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+              </button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -91,6 +96,11 @@
               </div>
               <div class="match-track"><div class="match-fill-teal" style="width: 75%;"></div></div>
             </div>
+            {% if second_has_majors %}
+            <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' result.second_recommended_program.program_id %}'">
+              <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+            </button>
+            {% endif %}
           </div>
         </div>
         {% endif %}
@@ -117,6 +127,11 @@
               </div>
               <div class="match-track"><div class="match-fill-yellow" style="width: 60%;"></div></div>
             </div>
+            {% if third_has_majors %}
+            <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' result.third_recommended_program.program_id %}'">
+              <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+            </button>
+            {% endif %}
           </div>
         </div>
         {% endif %}

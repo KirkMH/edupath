@@ -6,9 +6,13 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from django.http import JsonResponse
-from customization.models import AptitudeQuestion, ActivityLog, check_and_lock_account
+from customization.models import AptitudeQuestion, ActivityLog, Program, check_and_lock_account
 from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse, AssessmentResult
-from .services import sync_interest_questions, calculate_and_save_assessment_results, lookup_score_interpretation
+from .services import (
+    sync_interest_questions, calculate_and_save_assessment_results,
+    lookup_score_interpretation, calculate_major_recommendations
+)
+from django.shortcuts import render, redirect, get_object_or_404
 
 
 
@@ -710,6 +714,11 @@ def result(request):
     radar_polygon = f"{r_pt[0]},{r_pt[1]} {i_pt[0]},{i_pt[1]} {a_pt[0]},{a_pt[1]} {s_pt[0]},{s_pt[1]} {e_pt[0]},{e_pt[1]} {c_pt[0]},{c_pt[1]}"
     radar_dots = [r_pt, i_pt, a_pt, s_pt, e_pt, c_pt]
 
+    # Check if programs have majors
+    top_has_majors = bool(assessment_result.top_recommended_program and assessment_result.top_recommended_program.majors.exists())
+    second_has_majors = bool(assessment_result.second_recommended_program and assessment_result.second_recommended_program.majors.exists())
+    third_has_majors = bool(assessment_result.third_recommended_program and assessment_result.third_recommended_program.majors.exists())
+
     return render(request, 'assessment/result.html', {
         'result': assessment_result,
         'aptitude_items': aptitude_items,
@@ -718,7 +727,65 @@ def result(request):
         'top_riasec': top_riasec,
         'radar_polygon': radar_polygon,
         'radar_dots': radar_dots,
+        'top_has_majors': top_has_majors,
+        'second_has_majors': second_has_majors,
+        'third_has_majors': third_has_majors,
     })
+
+
+@login_required(login_url='signin')
+def major_recommendations(request, program_id):
+    """
+    Detailed Major Recommendation analysis page for a specific degree program.
+    Evaluates student's cognitive aptitude and RIASEC interest alignment against
+    the program's specialized majors.
+    """
+    student_profile = getattr(request.user, 'student_profile', None)
+    if not student_profile:
+        return redirect('dashboard')
+
+    assessment_result = getattr(student_profile, 'assessment_result', None)
+    if not assessment_result:
+        assessment_result = calculate_and_save_assessment_results(student_profile)
+
+    program = get_object_or_404(Program, pk=program_id)
+
+    # Ensure program has majors
+    if not program.majors.exists():
+        return redirect('result')
+
+    aptitude_scores = {
+        'numerical_score': assessment_result.numerical_score,
+        'logical_score': assessment_result.logical_score,
+        'problem_solving_score': assessment_result.problem_solving_score,
+        'spatial_score': assessment_result.spatial_score,
+        'technical_score': assessment_result.technical_score,
+        'verbal_score': assessment_result.verbal_score,
+    }
+    riasec_scores = {
+        'r_score': assessment_result.r_score,
+        'i_score': assessment_result.i_score,
+        'a_score': assessment_result.a_score,
+        's_score': assessment_result.s_score,
+        'e_score': assessment_result.e_score,
+        'c_score': assessment_result.c_score,
+        'riasec_code': assessment_result.riasec_code,
+    }
+
+    major_analysis = calculate_major_recommendations(
+        student_profile=student_profile,
+        program=program,
+        aptitude_scores=aptitude_scores,
+        riasec_scores=riasec_scores,
+    )
+
+    return render(request, 'assessment/major_result.html', {
+        'program': program,
+        'result': assessment_result,
+        'top_majors': major_analysis['top_majors'],
+        'all_majors': major_analysis['all_majors'],
+    })
+
 
 
 

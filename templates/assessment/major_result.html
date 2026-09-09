@@ -1,0 +1,146 @@
+{% extends 'assessment/base.html' %}
+{% load static %}
+
+{% block title %}EduPath | {{ program.abbreviation }} Major Recommendations{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/major-result.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="back-nav">
+      <a href="{% url 'result' %}" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Assessment Results
+      </a>
+    </div>
+
+    <!-- Parent Program Hero Card -->
+    <section class="major-hero-card">
+      <div class="major-badge">
+        <i class="fa-solid fa-graduation-cap"></i> Degree Specialization Analysis
+      </div>
+      <h1 class="major-hero-title">
+        {{ program.program_name }} {% if program.abbreviation %}({{ program.abbreviation }}){% endif %}
+      </h1>
+      <p class="major-hero-desc">
+        {{ program.description|default:"Explore recommended specializations and majors aligned with your cognitive aptitudes and personal career preferences." }}
+      </p>
+    </section>
+
+    <!-- Top 3 Recommended Majors Section -->
+    <section>
+      <div class="section-header-wrap">
+        <div class="section-title-group">
+          <div class="section-icon-box">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <h3>Top Recommended Majors</h3>
+            <p>Ranked according to your aptitude dimension scores and RIASEC profile match.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="majors-grid">
+        {% for item in top_majors %}
+        <div class="major-card {% if item.rank == 1 %}rank-1-card featured-card{% endif %}">
+          {% if item.rank == 1 %}
+            <div class="rank-tag tag-featured"><i class="fa-solid fa-crown"></i> #1 Recommendation</div>
+          {% elif item.rank == 2 %}
+            <div class="rank-tag tag-2">2</div>
+          {% elif item.rank == 3 %}
+            <div class="rank-tag tag-3">3</div>
+          {% else %}
+            <div class="rank-tag tag-other">{{ item.rank }}</div>
+          {% endif %}
+
+          <div class="major-card-body">
+            <h4 class="major-name">{{ item.major.name }}</h4>
+            <p class="major-description">{{ item.major.description|default:"Specialized major curriculum aligned with your assessed skill strengths and interests." }}</p>
+          </div>
+
+          <div class="major-match-box">
+            <div class="match-stats-row">
+              <span class="match-label">Match Score</span>
+              <span class="match-pct {% if item.rank == 1 %}pct-green{% elif item.rank == 2 %}pct-blue{% else %}pct-yellow{% endif %}">
+                {{ item.match_score }}%
+              </span>
+            </div>
+
+            <div class="match-bar-track">
+              <div class="match-bar-fill {% if item.rank == 1 %}fill-green{% elif item.rank == 2 %}fill-blue{% else %}fill-yellow{% endif %}" style="width: {{ item.match_score }}%;"></div>
+            </div>
+
+            <div class="alignment-tag-row">
+              <span style="font-size: 11px; color: #64748b; font-weight: 600;">Alignment Tier</span>
+              <span class="alignment-tier-badge {% if item.alignment_level == 'Very High' %}tier-very-high{% elif item.alignment_level == 'High' %}tier-high{% elif item.alignment_level == 'Moderate' %}tier-moderate{% else %}tier-low{% endif %}">
+                {{ item.alignment_level }}
+              </span>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p style="color: #64748b; font-style: italic;">No majors currently registered for this program.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Complete Major Rankings Table -->
+    {% if all_majors|length > 3 %}
+    <section class="all-majors-card">
+      <div class="section-header-wrap" style="margin-bottom: 12px;">
+        <div class="section-title-group">
+          <div class="section-icon-box" style="background: #e0f2fe; color: #0284c7;">
+            <i class="fa-solid fa-list-ol"></i>
+          </div>
+          <div>
+            <h3>All Available Majors Under {{ program.abbreviation }}</h3>
+            <p>Comprehensive alignment ranking of all academic specializations for this degree.</p>
+          </div>
+        </div>
+      </div>
+
+      <table class="majors-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">Rank</th>
+            <th>Major Name</th>
+            <th style="width: 140px; text-align: center;">Alignment Level</th>
+            <th style="width: 160px; text-align: right;">Match Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in all_majors %}
+          <tr>
+            <td>
+              <span class="table-rank-pill {% if item.rank == 1 %}rank-pill-1{% elif item.rank == 2 %}rank-pill-2{% elif item.rank == 3 %}rank-pill-3{% else %}rank-pill-other{% endif %}">
+                {{ item.rank }}
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">{{ item.major.name }}</div>
+              {% if item.major.description %}
+              <div style="font-size: 11.5px; color: #64748b;">{{ item.major.description }}</div>
+              {% endif %}
+            </td>
+            <td style="text-align: center;">
+              <span class="alignment-tier-badge {% if item.alignment_level == 'Very High' %}tier-very-high{% elif item.alignment_level == 'High' %}tier-high{% elif item.alignment_level == 'Moderate' %}tier-moderate{% else %}tier-low{% endif %}">
+                {{ item.alignment_level }}
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <span style="font-weight: 800; font-size: 14px; color: #0f172a;">{{ item.match_score }}%</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+    <div style="margin-top: 28px; text-align: center;">
+      <a href="{% url 'result' %}" class="back-link" style="display: inline-flex; padding: 10px 24px;">
+        <i class="fa-solid fa-arrow-left"></i> Return to Primary Assessment Results
+      </a>
+    </div>
+{% endblock %}

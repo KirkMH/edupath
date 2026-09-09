@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.db.models import Case, When, Value, IntegerField
-from .models import Program, AptitudeQuestion, ProgramCriteria, ScoreInterpretation, InterestQuestion, ActivityLog, DEFAULT_DIMENSIONS, DEFAULT_SCORE_TIERS
-
-
-
-
+from django.urls import reverse
+from django.utils.html import format_html
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import (
+    Program, Major, MajorCriteria, AptitudeQuestion, ProgramCriteria,
+    ScoreInterpretation, InterestQuestion, ActivityLog, DEFAULT_DIMENSIONS, DEFAULT_SCORE_TIERS
+)
 
 # Configure Admin site header and titles
 admin.site.site_header = "EduPath Administration"
@@ -44,6 +45,84 @@ class CustomUserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser')
 
 
+
+class MajorCriteriaInline(admin.TabularInline):
+    model = MajorCriteria
+    extra = 0
+    max_num = 0
+    can_delete = False
+    fields = ('dimension_name', 'weight', 'minimum_level')
+    readonly_fields = ('dimension_name',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        whens = [When(dimension_name=dim, then=Value(i)) for i, dim in enumerate(DEFAULT_DIMENSIONS)]
+        return qs.annotate(
+            custom_order=Case(*whens, default=Value(99), output_field=IntegerField())
+        ).order_by('custom_order')
+
+
+@admin.register(Major)
+class MajorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'program', 'description', 'created_at')
+    list_filter = ('program',)
+    search_fields = ('name', 'program__program_name', 'program__abbreviation')
+    fields = ('program', 'name', 'description')
+    inlines = [MajorCriteriaInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ('program',)
+        return ()
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        if obj:
+            for dim in DEFAULT_DIMENSIONS:
+                MajorCriteria.objects.get_or_create(
+                    major=obj,
+                    dimension_name=dim,
+                    defaults={
+                        'weight': 0.00,
+                        'minimum_level': 'Not Applicable'
+                    }
+                )
+        return super().get_formsets_with_inlines(request, obj)
+
+
+class MajorInline(admin.TabularInline):
+    model = Major
+    extra = 0
+    max_num = 0
+    can_delete = False
+    fields = ('name', 'description', 'manage_criteria_link')
+    readonly_fields = ('name', 'description', 'manage_criteria_link')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def manage_criteria_link(self, obj):
+        if obj and obj.pk:
+            url = reverse('admin:customization_major_change', args=[obj.pk])
+            return format_html(
+                '<a class="button" href="{}" style="padding: 4px 10px; font-weight: 600; text-decoration: none; border-radius: 4px; background: #0284c7; color: #fff !important;">'
+                'Configure</a>',
+                url
+            )
+        return format_html('<span style="color: #94a3b8; font-style: italic;">Save program first</span>')
+    manage_criteria_link.short_description = "Major Criteria"
+
+
+
+
 class ProgramCriteriaInline(admin.TabularInline):
     model = ProgramCriteria
     extra = 0
@@ -68,10 +147,15 @@ class ProgramCriteriaInline(admin.TabularInline):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('abbreviation', 'program_name', 'min_gwa', 'created_at')
+    list_display = ('abbreviation', 'program_name', 'min_gwa', 'major_count', 'created_at')
     search_fields = ('program_name', 'abbreviation')
     fields = ('program_name', 'abbreviation', 'description', 'min_gwa')
-    inlines = [ProgramCriteriaInline]
+    inlines = [MajorInline, ProgramCriteriaInline]
+
+    def major_count(self, obj):
+        count = obj.majors.count()
+        return f"{count} Major{'s' if count != 1 else ''}" if count > 0 else "None"
+    major_count.short_description = "Majors"
 
     def get_formsets_with_inlines(self, request, obj=None):
         if obj:
@@ -166,4 +250,4 @@ class ActivityLogAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
-
+

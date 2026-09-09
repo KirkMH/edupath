@@ -15,6 +15,7 @@ urlpatterns = [
     path('loading/', views.loading, name='loading'),
     path('process-results/', views.process_results, name='process_results'),
     path('result/', views.result, name='result'),
+    path('results/majors/<int:program_id>/', views.major_recommendations, name='major_recommendations'),
     path('retake/', views.retake_assessment, name='retake_assessment'),
 ]
 

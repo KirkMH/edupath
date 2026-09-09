@@ -447,3 +447,94 @@ def calculate_and_save_assessment_results(student_profile):
 
     return result_obj
 
+
+def calculate_major_recommendations(student_profile, program, aptitude_scores=None, riasec_scores=None):
+    """
+    Evaluates all Majors for a given Program using MajorCriteria weights,
+    minimum_level penalty multipliers, and ScoreInterpretation model tiers.
+    Returns ranked list of majors, top 3 recommended majors, match scores, and alignment levels.
+    """
+    from customization.models import Major, MajorCriteria
+
+    if aptitude_scores is None:
+        aptitude_scores = calculate_aptitude_dimension_scores(student_profile)
+    if riasec_scores is None:
+        riasec_scores = get_riasec_results(student_profile)
+
+    # Map normalized scores (0 - 100%) across all 12 dimensions
+    dim_to_student_score = {
+        'Numerical Reasoning': float(aptitude_scores.get('numerical_score', 0)),
+        'Logical Reasoning': float(aptitude_scores.get('logical_score', 0)),
+        'Problem-Solving': float(aptitude_scores.get('problem_solving_score', 0)),
+        'Spatial Ability': float(aptitude_scores.get('spatial_score', 0)),
+        'Technical/Mechanical Reasoning': float(aptitude_scores.get('technical_score', 0)),
+        'Verbal/Communication Ability': float(aptitude_scores.get('verbal_score', 0)),
+        'Realistic': min(100.0, (float(riasec_scores.get('r_score', 0)) / 40.0) * 100.0),
+        'Investigative': min(100.0, (float(riasec_scores.get('i_score', 0)) / 40.0) * 100.0),
+        'Artistic': min(100.0, (float(riasec_scores.get('a_score', 0)) / 40.0) * 100.0),
+        'Social': min(100.0, (float(riasec_scores.get('s_score', 0)) / 40.0) * 100.0),
+        'Enterprising': min(100.0, (float(riasec_scores.get('e_score', 0)) / 40.0) * 100.0),
+        'Conventional': min(100.0, (float(riasec_scores.get('c_score', 0)) / 40.0) * 100.0),
+    }
+
+    dim_to_student_level = {
+        dim_name: lookup_score_interpretation(score_val)
+        for dim_name, score_val in dim_to_student_score.items()
+    }
+
+    majors = Major.objects.filter(program=program)
+    major_rankings = []
+
+    for major in majors:
+        criteria = MajorCriteria.objects.filter(major=major)
+        total_score = 0.0
+        total_weight = 0.0
+
+        for crit in criteria:
+            w = float(crit.weight)
+            total_weight += w
+            norm_score = dim_to_student_score.get(crit.dimension_name, 0.0)
+            student_level_label = dim_to_student_level.get(crit.dimension_name, 'Very Low')
+
+            # Threshold Multiplier Evaluation
+            req_level = crit.minimum_level
+            if req_level == 'Not Applicable':
+                multiplier = 1.0
+            else:
+                student_rank = LEVEL_RANK.get(student_level_label, 0)
+                required_rank = LEVEL_RANK.get(req_level, 0)
+                if student_rank >= required_rank:
+                    multiplier = 1.0
+                else:
+                    multiplier = 0.5
+
+            total_score += (norm_score * w * multiplier)
+
+        final_score = (total_score / total_weight) if total_weight > 0 else total_score
+
+        top_riasec_char = riasec_scores.get('riasec_code', 'R-I-A').split('-')[0]
+        riasec_char_map = {'R': 'Realistic', 'I': 'Investigative', 'A': 'Artistic', 'S': 'Social', 'E': 'Enterprising', 'C': 'Conventional'}
+        primary_dim_name = riasec_char_map.get(top_riasec_char, 'Realistic')
+        primary_riasec_score = dim_to_student_score.get(primary_dim_name, 0.0)
+
+        alignment_level = lookup_score_interpretation(final_score)
+        major_rankings.append({
+            'major': major,
+            'match_score': round(final_score, 1),
+            'primary_riasec_score': primary_riasec_score,
+            'alignment_level': alignment_level,
+        })
+
+    major_rankings.sort(key=lambda x: (x['match_score'], x['primary_riasec_score']), reverse=True)
+
+    for idx, item in enumerate(major_rankings):
+        item['rank'] = idx + 1
+
+    top_majors = major_rankings[:3]
+    return {
+        'program': program,
+        'all_majors': major_rankings,
+        'top_majors': top_majors,
+    }
+
+
