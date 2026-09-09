@@ -42,7 +42,37 @@
 
       <div class="recommendations-grid">
         <!-- Degree Card 1 (Featured Top Recommendation) -->
-        {% if result.top_recommended_program %}
+        {% if top_program %}
+        <div class="degree-card featured-card">
+          <div class="rank-tag tag-featured"><i class="fa-solid fa-crown"></i> Top Recommendation</div>
+          <div class="degree-body-grid">
+            <div>
+              <div class="degree-header">
+                <div class="degree-title" style="font-size: 16px;">
+                  {{ top_program.program.program_name }}
+                  {% if top_program.program.abbreviation %}({{ top_program.program.abbreviation }}){% endif %}
+                </div>
+              </div>
+              <p class="degree-desc" style="margin-bottom: 0;">{{ top_program.program.description|default:"Top matching degree program aligned with your aptitude strengths and RIASEC interest themes." }}</p>
+            </div>
+
+            <div>
+              <div class="match-section">
+                <div class="match-header">
+                  <span class="match-title">Alignment</span>
+                  <span class="match-value val-blue" style="font-size: 16px;">{{ top_program.alignment_level }}</span>
+                </div>
+                <div class="match-track" style="height: 8px;"><div class="match-fill-blue" style="width: {{ top_program.match_score }}%;"></div></div>
+              </div>
+              {% if top_has_majors %}
+              <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' top_program.program.program_id %}'">
+                <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+              </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% elif result.top_recommended_program %}
         <div class="degree-card featured-card">
           <div class="rank-tag tag-featured"><i class="fa-solid fa-crown"></i> Top Recommendation</div>
           <div class="degree-body-grid">
@@ -75,7 +105,35 @@
         {% endif %}
 
         <!-- Degree Card 2 -->
-        {% if result.second_recommended_program %}
+        {% if second_program %}
+        <div class="degree-card">
+          <div class="rank-tag tag-2">2</div>
+          <div>
+            <div class="degree-header">
+              <div class="degree-title">
+                {{ second_program.program.program_name }}
+                {% if second_program.program.abbreviation %}({{ second_program.program.abbreviation }}){% endif %}
+              </div>
+            </div>
+            <p class="degree-desc">{{ second_program.program.description|default:"Strong alternative degree program matching your cognitive aptitude and personal career interest profile." }}</p>
+          </div>
+
+          <div>
+            <div class="match-section">
+              <div class="match-header">
+                <span class="match-title">Alignment</span>
+                <span class="match-value val-teal" style="font-size: 14px;">{{ second_program.alignment_level }}</span>
+              </div>
+              <div class="match-track"><div class="match-fill-teal" style="width: {{ second_program.match_score }}%;"></div></div>
+            </div>
+            {% if second_has_majors %}
+            <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' second_program.program.program_id %}'">
+              <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        {% elif result.second_recommended_program %}
         <div class="degree-card">
           <div class="rank-tag tag-2">2</div>
           <div>
@@ -106,7 +164,35 @@
         {% endif %}
 
         <!-- Degree Card 3 -->
-        {% if result.third_recommended_program %}
+        {% if third_program %}
+        <div class="degree-card">
+          <div class="rank-tag tag-3">3</div>
+          <div>
+            <div class="degree-header">
+              <div class="degree-title">
+                {{ third_program.program.program_name }}
+                {% if third_program.program.abbreviation %}({{ third_program.program.abbreviation }}){% endif %}
+              </div>
+            </div>
+            <p class="degree-desc">{{ third_program.program.description|default:"Viable academic program option providing solid alignment across your evaluated competencies." }}</p>
+          </div>
+
+          <div>
+            <div class="match-section">
+              <div class="match-header">
+                <span class="match-title">Alignment</span>
+                <span class="match-value val-orange" style="font-size: 14px;">{{ third_program.alignment_level }}</span>
+              </div>
+              <div class="match-track"><div class="match-fill-yellow" style="width: {{ third_program.match_score }}%;"></div></div>
+            </div>
+            {% if third_has_majors %}
+            <button type="button" class="btn-explore-majors" onclick="window.location.href='{% url 'major_recommendations' third_program.program.program_id %}'">
+              <i class="fa-solid fa-list-check"></i> Explore Recommended Majors
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        {% elif result.third_recommended_program %}
         <div class="degree-card">
           <div class="rank-tag tag-3">3</div>
           <div>

@@ -10,7 +10,8 @@ from customization.models import AptitudeQuestion, ActivityLog, Program, check_a
 from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResponse, AssessmentResult
 from .services import (
     sync_interest_questions, calculate_and_save_assessment_results,
-    lookup_score_interpretation, calculate_major_recommendations
+    lookup_score_interpretation, calculate_major_recommendations,
+    calculate_program_recommendations
 )
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -714,13 +715,43 @@ def result(request):
     radar_polygon = f"{r_pt[0]},{r_pt[1]} {i_pt[0]},{i_pt[1]} {a_pt[0]},{a_pt[1]} {s_pt[0]},{s_pt[1]} {e_pt[0]},{e_pt[1]} {c_pt[0]},{c_pt[1]}"
     radar_dots = [r_pt, i_pt, a_pt, s_pt, e_pt, c_pt]
 
+    # Calculate detailed recommendations with individual scores and alignment levels
+    prog_recs = calculate_program_recommendations(
+        student_profile=student_profile,
+        aptitude_scores={
+            'numerical_score': assessment_result.numerical_score,
+            'logical_score': assessment_result.logical_score,
+            'problem_solving_score': assessment_result.problem_solving_score,
+            'spatial_score': assessment_result.spatial_score,
+            'technical_score': assessment_result.technical_score,
+            'verbal_score': assessment_result.verbal_score,
+        },
+        riasec_scores={
+            'r_score': assessment_result.r_score,
+            'i_score': assessment_result.i_score,
+            'a_score': assessment_result.a_score,
+            's_score': assessment_result.s_score,
+            'e_score': assessment_result.e_score,
+            'c_score': assessment_result.c_score,
+            'riasec_code': assessment_result.riasec_code,
+        },
+    )
+    ranked_programs = prog_recs.get('ranked_programs', [])
+    top_program = ranked_programs[0] if len(ranked_programs) > 0 else None
+    second_program = ranked_programs[1] if len(ranked_programs) > 1 else None
+    third_program = ranked_programs[2] if len(ranked_programs) > 2 else None
+
     # Check if programs have majors
-    top_has_majors = bool(assessment_result.top_recommended_program and assessment_result.top_recommended_program.majors.exists())
-    second_has_majors = bool(assessment_result.second_recommended_program and assessment_result.second_recommended_program.majors.exists())
-    third_has_majors = bool(assessment_result.third_recommended_program and assessment_result.third_recommended_program.majors.exists())
+    top_has_majors = bool(top_program and top_program['has_majors'])
+    second_has_majors = bool(second_program and second_program['has_majors'])
+    third_has_majors = bool(third_program and third_program['has_majors'])
 
     return render(request, 'assessment/result.html', {
         'result': assessment_result,
+        'top_program': top_program,
+        'second_program': second_program,
+        'third_program': third_program,
+        'ranked_programs': ranked_programs,
         'aptitude_items': aptitude_items,
         'riasec_items': riasec_items,
         'top_aptitudes': top_aptitudes,

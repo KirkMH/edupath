@@ -386,9 +386,24 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
     third_prog = program_rankings[2][0] if len(program_rankings) > 2 else None
 
     top_score = program_rankings[0][1] if len(program_rankings) > 0 else 0.0
+    sec_score = program_rankings[1][1] if len(program_rankings) > 1 else 0.0
+    third_score = program_rankings[2][1] if len(program_rankings) > 2 else 0.0
 
     # Overall Alignment Level: determined by passing top_score through ScoreInterpretation model tiers
     alignment_level = lookup_score_interpretation(top_score)
+    sec_alignment_level = lookup_score_interpretation(sec_score) if sec_prog else 'Low'
+    third_alignment_level = lookup_score_interpretation(third_score) if third_prog else 'Low'
+
+    ranked_programs = []
+    for idx, item in enumerate(program_rankings[:3]):
+        prog_obj, score_val, _ = item
+        ranked_programs.append({
+            'rank': idx + 1,
+            'program': prog_obj,
+            'match_score': round(score_val, 1),
+            'alignment_level': lookup_score_interpretation(score_val),
+            'has_majors': bool(prog_obj.majors.exists()),
+        })
 
     if top_prog:
         explanation = (
@@ -405,6 +420,12 @@ def calculate_program_recommendations(student_profile, aptitude_scores, riasec_s
         'second_recommended_program': sec_prog,
         'third_recommended_program': third_prog,
         'alignment_level': alignment_level,
+        'top_score': round(top_score, 1),
+        'second_alignment_level': sec_alignment_level,
+        'second_score': round(sec_score, 1),
+        'third_alignment_level': third_alignment_level,
+        'third_score': round(third_score, 1),
+        'ranked_programs': ranked_programs,
         'generated_explanation': explanation,
     }
 
