@@ -16,6 +16,7 @@ class StudentProfile(models.Model):
     )
     username = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Username")
     full_name = models.CharField(max_length=128, blank=True, null=True, verbose_name="Full Name")
+    date_of_birth = models.DateField(blank=True, null=True, verbose_name="Date of Birth")
     age = models.PositiveIntegerField(blank=True, null=True, verbose_name="Age")
     sex = models.CharField(max_length=20, blank=True, null=True, verbose_name="Sex")
     gwa = models.DecimalField(
@@ -29,6 +30,18 @@ class StudentProfile(models.Model):
     security_question = models.CharField(max_length=255, blank=True, null=True, verbose_name="Security Question")
     security_answer = models.CharField(max_length=255, blank=True, null=True, verbose_name="Security Answer")
     last_date_taken = models.DateTimeField(blank=True, null=True, verbose_name="Last Date Taken")
+
+    def calculate_age(self):
+        if self.date_of_birth:
+            from datetime import date
+            today = date.today()
+            return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+        return self.age
+
+    def save(self, *args, **kwargs):
+        if self.date_of_birth and not self.age:
+            self.age = self.calculate_age()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Profile: {self.user.username} ({self.full_name or 'N/A'}, GWA: {self.gwa or 'N/A'})"

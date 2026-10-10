@@ -4,7 +4,7 @@ from .models import StudentProfile, StudentAptitudeResponse, StudentInterestResp
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('username', 'full_name', 'user', 'gwa', 'age', 'sex', 'last_date_taken')
+    list_display = ('username', 'full_name', 'user', 'gwa', 'date_of_birth', 'age', 'sex', 'last_date_taken')
     search_fields = ('username', 'full_name', 'user__username', 'user__email')
     list_filter = ('sex', 'age')
 

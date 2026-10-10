@@ -1,4 +1,5 @@
 import random
+from datetime import datetime, date
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -35,6 +36,7 @@ def signup(request):
     if request.method == 'POST':
         full_name = request.POST.get('fullName', '').strip()
         sex = request.POST.get('sex', '').strip()
+        dob_raw = request.POST.get('dateOfBirth', '').strip() or request.POST.get('date_of_birth', '').strip() or request.POST.get('dob', '').strip()
         age_raw = request.POST.get('age', '').strip()
         gwa_raw = request.POST.get('gwa', '').strip()
         username = request.POST.get('username', '').strip()
@@ -52,8 +54,8 @@ def signup(request):
             errors.append("Full Name is required.")
         if not sex:
             errors.append("Sex is required.")
-        if not age_raw:
-            errors.append("Age is required.")
+        if not dob_raw and not age_raw:
+            errors.append("Date of Birth is required.")
         if not gwa_raw:
             errors.append("General Weighted Average (GWA) is required.")
         if not username:
@@ -64,6 +66,27 @@ def signup(request):
             errors.append("Security question is required.")
         if not security_answer:
             errors.append("Security answer is required.")
+
+        # Validate Date of Birth / Age
+        date_of_birth = None
+        age = None
+        if dob_raw:
+            try:
+                date_of_birth = datetime.strptime(dob_raw, '%Y-%m-%d').date()
+                today = timezone.localdate() if hasattr(timezone, 'localdate') else date.today()
+                if date_of_birth > today:
+                    errors.append("Date of Birth cannot be in the future.")
+                else:
+                    age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+                    if age < 5 or age > 120:
+                        errors.append("Please enter a valid Date of Birth.")
+            except ValueError:
+                errors.append("Please enter a valid Date of Birth (YYYY-MM-DD).")
+        elif age_raw:
+            try:
+                age = int(age_raw)
+            except ValueError:
+                age = None
 
         # Validate GWA numeric bounds
         gwa = None
@@ -101,6 +124,7 @@ def signup(request):
                 'form_data': {
                     'fullName': full_name,
                     'sex': sex,
+                    'dateOfBirth': dob_raw,
                     'age': age_raw,
                     'gwa': gwa_raw,
                     'username': username,
@@ -109,12 +133,6 @@ def signup(request):
                     'securityAnswer': security_answer,
                 }
             })
-
-        # Parse age integer safely
-        try:
-            age = int(age_raw)
-        except ValueError:
-            age = None
 
         # Create Django User (username=username) & StudentProfile
         try:
@@ -128,6 +146,7 @@ def signup(request):
                 user=user,
                 username=username,
                 full_name=full_name,
+                date_of_birth=date_of_birth,
                 age=age,
                 sex=sex,
                 gwa=gwa,
@@ -145,6 +164,7 @@ def signup(request):
                 'form_data': {
                     'fullName': full_name,
                     'sex': sex,
+                    'dateOfBirth': dob_raw,
                     'age': age_raw,
                     'gwa': gwa_raw,
                     'username': username,

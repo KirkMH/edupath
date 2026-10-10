@@ -29,6 +29,62 @@ class SignUpAndLoginTests(TestCase):
             security_answer='Fluffy'
         )
 
+    def test_successful_signup_with_date_of_birth(self):
+        data = {
+            'fullName': 'Alice Wonderland',
+            'username': 'alice_w',
+            'dateOfBirth': '2004-05-15',
+            'sex': 'Female',
+            'gwa': '90.00',
+            'email': 'alice@example.com',
+            'password': 'SecurePassword123!',
+            'confirmPassword': 'SecurePassword123!',
+            'securityQuestion': 'What was the name of your first pet?',
+            'securityAnswer': 'Cheshire',
+            'terms': 'on'
+        }
+        response = self.client.post(self.signup_url, data)
+        self.assertRedirects(response, self.dashboard_url)
+        profile = StudentProfile.objects.filter(username='alice_w').first()
+        self.assertIsNotNone(profile)
+        self.assertEqual(str(profile.date_of_birth), '2004-05-15')
+        self.assertGreaterEqual(profile.age, 20)
+
+    def test_signup_future_date_of_birth(self):
+        data = {
+            'fullName': 'Future Student',
+            'username': 'futurestudent',
+            'dateOfBirth': '2099-01-01',
+            'sex': 'Male',
+            'gwa': '85.00',
+            'email': '',
+            'password': 'SecurePassword123!',
+            'confirmPassword': 'SecurePassword123!',
+            'securityQuestion': 'What was the name of your first pet?',
+            'securityAnswer': 'Fluffy',
+            'terms': 'on'
+        }
+        response = self.client.post(self.signup_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Date of Birth cannot be in the future.")
+
+    def test_signup_missing_date_of_birth_and_age(self):
+        data = {
+            'fullName': 'No Dob Student',
+            'username': 'nodobstudent',
+            'sex': 'Male',
+            'gwa': '85.00',
+            'email': '',
+            'password': 'SecurePassword123!',
+            'confirmPassword': 'SecurePassword123!',
+            'securityQuestion': 'What was the name of your first pet?',
+            'securityAnswer': 'Fluffy',
+            'terms': 'on'
+        }
+        response = self.client.post(self.signup_url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Date of Birth is required.")
+
     def test_successful_signup_with_email(self):
         data = {
             'fullName': 'Jane Doe',
