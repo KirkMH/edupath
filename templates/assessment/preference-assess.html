@@ -27,11 +27,11 @@
           <div class="hero-progress">
             <div class="progress-left">
               <h4>Overall Progress</h4>
-              <p>Question <span class="current" id="current-q-num">1</span> of <span class="total" id="total-q-num">{{ total_questions }}</span></p>
+              <p>Question <span class="current current-q-num" id="current-q-num">1</span> of <span class="total total-q-num" id="total-q-num">{{ total_questions|default:questions|length }}</span></p>
             </div>
             <div class="progress-right">
               <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progress-fill" style="width: 1.67%;"></div>
+                <div class="progress-bar-fill" id="progress-fill" style="width: 2%;"></div>
               </div>
               <div class="progress-percentage" id="progress-text">2%</div>
             </div>
@@ -153,17 +153,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const cards = document.querySelectorAll('.question-item-card[data-question-step]');
     const totalSteps = cards.length;
 
-    const currentQNum = document.getElementById('current-q-num');
-    const totalQNum = document.getElementById('total-q-num');
-    const progressFill = document.getElementById('progress-fill');
-    const progressText = document.getElementById('progress-text');
     const pageLinks = document.querySelectorAll('.page-link');
 
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
     const btnSubmit = document.getElementById('btn-submit');
 
-    const userAnswers = {{ user_answers_json|safe }};
+    const userAnswers = {{ user_answers_json|default:"{}"|safe }};
     let currentStep = 1;
 
     // Pre-fill existing user answers
@@ -200,13 +196,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Update progress counts
-        if (currentQNum) currentQNum.textContent = currentStep;
-        if (totalQNum) totalQNum.textContent = totalSteps;
+        // Update progress counts across all cards
+        document.querySelectorAll('.current-q-num, #current-q-num').forEach(el => el.textContent = currentStep);
+        document.querySelectorAll('.total-q-num, #total-q-num').forEach(el => el.textContent = totalSteps);
 
         const percent = Math.round((currentStep / totalSteps) * 100);
-        if (progressFill) progressFill.style.width = percent + '%';
-        if (progressText) progressText.textContent = percent + '%';
+        document.querySelectorAll('.progress-bar-fill, #progress-fill').forEach(el => el.style.width = percent + '%');
+        document.querySelectorAll('.progress-percentage, #progress-text').forEach(el => el.textContent = percent + '%');
 
         // Prev Button state
         if (currentStep === 1) {
