@@ -21,6 +21,14 @@ from assessment import views
 admin.site.login = views.signin
 admin.site.logout = views.signout
 
+# New admin users are created with is_superuser=True only (is_staff is hidden).
+# Django's default has_permission only checks is_staff, so we extend it to also
+# grant access to superusers — consistent with how the rest of the app treats them.
+def _has_permission(self, request):
+    return request.user.is_active and (request.user.is_staff or request.user.is_superuser)
+
+admin.site.has_permission = types.MethodType(_has_permission, admin.site)
+
 urlpatterns = [
     path('admin/logout/', views.signout, name='admin_logout'),
     path('admin/', admin.site.urls),
