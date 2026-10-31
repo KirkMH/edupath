@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from assessment import views
+import types
 
 admin.site.login = views.signin
 admin.site.logout = views.signout
