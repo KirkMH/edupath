@@ -154,9 +154,8 @@ def signup(request):
                 security_answer=security_answer
             )
 
-            # Log in the user and redirect to dashboard
-            login(request, user)
-            return redirect('dashboard')
+            # Do not auto-login; user must sign in with their new credentials
+            return redirect('/signin/?registered=success')
         except IntegrityError:
             errors.append("An error occurred while creating your account. Please verify your information and try again.")
             return render(request, 'signup.html', {
@@ -186,6 +185,8 @@ def signin(request):
     success = None
     if request.GET.get('reset') == 'success':
         success = "Password updated successfully! Please sign in with your new password."
+    elif request.GET.get('registered') == 'success':
+        success = "Account created successfully! Please sign in to continue."
 
     if request.method == 'POST':
         login_id = request.POST.get('login_id', request.POST.get('username', request.POST.get('email', ''))).strip()

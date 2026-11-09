@@ -12,6 +12,7 @@
       <a href="{% url 'dashboard' %}" class="back-link">
         <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
       </a>
+      {% include 'assessment/_result_actions.html' with pdf_filename='EduPath-Assessment-Results.pdf' %}
     </div>
 
     <!-- Hero Header -->
@@ -60,7 +61,7 @@
               <div class="match-section">
                 <div class="match-header">
                   <span class="match-title">Alignment</span>
-                  <span class="match-value val-blue" style="font-size: 16px;">{{ top_program.alignment_level }}</span>
+                  <span class="match-value val-blue" style="font-size: 16px;">{{ top_program.match_score }}% ({{ top_program.alignment_level }})</span>
                 </div>
                 <div class="match-track" style="height: 8px;"><div class="match-fill-blue" style="width: {{ top_program.match_score }}%;"></div></div>
               </div>
@@ -122,7 +123,7 @@
             <div class="match-section">
               <div class="match-header">
                 <span class="match-title">Alignment</span>
-                <span class="match-value val-teal" style="font-size: 14px;">{{ second_program.alignment_level }}</span>
+                <span class="match-value val-teal" style="font-size: 14px;">{{ second_program.match_score }}% ({{ second_program.alignment_level }})</span>
               </div>
               <div class="match-track"><div class="match-fill-teal" style="width: {{ second_program.match_score }}%;"></div></div>
             </div>
@@ -181,7 +182,7 @@
             <div class="match-section">
               <div class="match-header">
                 <span class="match-title">Alignment</span>
-                <span class="match-value val-orange" style="font-size: 14px;">{{ third_program.alignment_level }}</span>
+                <span class="match-value val-orange" style="font-size: 14px;">{{ third_program.match_score }}% ({{ third_program.alignment_level }})</span>
               </div>
               <div class="match-track"><div class="match-fill-yellow" style="width: {{ third_program.match_score }}%;"></div></div>
             </div>

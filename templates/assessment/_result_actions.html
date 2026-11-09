@@ -1,0 +1,70 @@
+<div class="result-actions no-print">
+  <button type="button" class="btn-result-action" onclick="window.print()">
+    <i class="fa-solid fa-print"></i> Print
+  </button>
+  <button type="button" class="btn-result-action btn-result-action-primary" id="downloadPdfBtn" data-filename="{{ pdf_filename }}">
+    <i class="fa-solid fa-file-pdf"></i> Download PDF
+  </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  (function () {
+    var MARGIN_MM = 10, PAGE_W_MM = 210, PAGE_H_MM = 297;
+    // Blocks that must not be split across PDF pages (same list as the @media print rules in assessment.css)
+    var KEEP_WHOLE = '.hero-section, .major-hero-card, .card-header-group, .section-header-wrap, .degree-card, .major-card, .aptitude-item, .interest-item, .riasec-row, .strength-item, .radar-chart-container, .disclaimer-banner, .unique-path-banner, tr';
+
+    // Runs on html2pdf's off-screen copy before capture: drops screen-only controls, then pushes any block
+    // that crosses a page edge down to the next page. html2pdf's own pagebreak.avoid can't handle table rows.
+    function prepareForPdf(root) {
+      // Same elements the @media print rules hide
+      root.querySelectorAll('.no-print, .back-link, .btn-explore-majors').forEach(function (el) { el.remove(); });
+      // Cards use `transition: all`, which would animate the pushed margins instead of applying them
+      var noAnim = document.createElement('style');
+      noAnim.textContent = '.html2pdf__container * { transition: none !important; animation: none !important; }';
+      root.prepend(noAnim);
+      var rootTop = root.getBoundingClientRect().top;
+      // Canvas width is the rounded-up container width; match html2pdf's page slicing
+      var pageH = Math.ceil(root.getBoundingClientRect().width) * (PAGE_H_MM - 2 * MARGIN_MM) / (PAGE_W_MM - 2 * MARGIN_MM);
+      root.querySelectorAll(KEEP_WHOLE).forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var top = r.top - rootTop;
+        var offset = top % pageH;
+        if (r.height >= pageH || offset + r.height <= pageH) return;
+        var target = top - offset + pageH + 8; // start of next page, plus a little breathing room
+        // Margins can collapse with the block above, so re-measure and top up until the block reaches the target
+        for (var i = 0; i < 3; i++) {
+          var push = target - (el.getBoundingClientRect().top - rootTop);
+          if (push < 0.5) break;
+          if (el.tagName === 'TR') {
+            // margins don't apply to table rows, so pad their cells instead
+            Array.prototype.forEach.call(el.cells, function (td) {
+              td.style.paddingTop = (parseFloat(getComputedStyle(td).paddingTop) + push) + 'px';
+            });
+          } else {
+            el.style.marginTop = (parseFloat(getComputedStyle(el).marginTop) + push) + 'px';
+          }
+        }
+      });
+    }
+
+    document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+      var btn = this;
+      var label = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparing...';
+      html2pdf().set({
+        margin: MARGIN_MM,
+        filename: btn.dataset.filename,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(document.querySelector('main.container')).toContainer().then(function () {
+        prepareForPdf(this.prop.container);
+      }).save().finally(function () {
+        btn.disabled = false;
+        btn.innerHTML = label;
+      });
+    });
+  })();
+</script>
