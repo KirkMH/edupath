@@ -536,3 +536,106 @@
         font-size: 12px;
     }
 }
+
+/* ---------------- Result Print / Download Actions ---------------- */
+.result-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-result-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--navy-900);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-result-action:hover {
+    border-color: var(--primary);
+}
+
+.btn-result-action-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+}
+
+.btn-result-action-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-result-action:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+@media (max-width: 600px) {
+    .back-nav {
+        flex-wrap: wrap;
+    }
+}
+
+@media print {
+    .header,
+    .no-print,
+    .back-link,
+    .btn-explore-majors {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Chrome prints shadows as solid grey boxes */
+    * {
+        box-shadow: none !important;
+    }
+
+    /* Chrome moves a whole grid/flex container to the next page when an item can't split; plain blocks break cleanly */
+    .results-grid,
+    .recommendations-grid,
+    .majors-grid,
+    .result-card {
+        display: block;
+    }
+
+    .results-grid > *,
+    .recommendations-grid > *,
+    .majors-grid > * {
+        margin-bottom: 20px;
+    }
+
+    /* Same list as KEEP_WHOLE in _result_actions.html */
+    .hero-section,
+    .major-hero-card,
+    .card-header-group,
+    .section-header-wrap,
+    .degree-card,
+    .major-card,
+    .aptitude-item,
+    .interest-item,
+    .riasec-row,
+    .strength-item,
+    .radar-chart-container,
+    .disclaimer-banner,
+    .unique-path-banner,
+    tr {
+        break-inside: avoid;
+    }
+
+    .card-header-group,
+    .section-header-wrap {
+        break-after: avoid;
+    }
+}

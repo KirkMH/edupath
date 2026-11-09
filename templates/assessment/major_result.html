@@ -12,6 +12,7 @@
       <a href="{% url 'result' %}" class="back-link">
         <i class="fa-solid fa-arrow-left"></i> Back to Assessment Results
       </a>
+      {% include 'assessment/_result_actions.html' with pdf_filename='EduPath-'|add:program.abbreviation|add:'-Major-Recommendations.pdf' %}
     </div>
 
     <!-- Parent Program Hero Card -->
