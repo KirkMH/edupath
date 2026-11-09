@@ -44,7 +44,8 @@ class SignUpAndLoginTests(TestCase):
             'terms': 'on'
         }
         response = self.client.post(self.signup_url, data)
-        self.assertRedirects(response, self.dashboard_url)
+        self.assertRedirects(response, f"{self.signin_url}?registered=success")
+        self.assertNotIn("_auth_user_id", self.client.session)
         profile = StudentProfile.objects.filter(username='alice_w').first()
         self.assertIsNotNone(profile)
         self.assertEqual(str(profile.date_of_birth), '2004-05-15')
@@ -100,7 +101,7 @@ class SignUpAndLoginTests(TestCase):
             'terms': 'on'
         }
         response = self.client.post(self.signup_url, data)
-        self.assertRedirects(response, self.dashboard_url)
+        self.assertRedirects(response, f"{self.signin_url}?registered=success")
         self.assertTrue(User.objects.filter(username='janedoe', email='jane@example.com').exists())
         profile = StudentProfile.objects.filter(username='janedoe', full_name='Jane Doe').first()
         self.assertIsNotNone(profile)
@@ -121,7 +122,7 @@ class SignUpAndLoginTests(TestCase):
             'terms': 'on'
         }
         response = self.client.post(self.signup_url, data)
-        self.assertRedirects(response, self.dashboard_url)
+        self.assertRedirects(response, f"{self.signin_url}?registered=success")
         profile = StudentProfile.objects.filter(username='noemailstudent', full_name='No Email Student').first()
         self.assertIsNotNone(profile)
         self.assertEqual(float(profile.gwa), 92.00)
